@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace GestionProyectoEscritorio
 {
@@ -11,24 +13,23 @@ namespace GestionProyectoEscritorio
     {
         private List<Usuario> listaUsuarios = new List<Usuario>(); // Lista de usuarios
         private List<Proyecto> listaProyectos = new List<Proyecto>(); // Lista de proyectos
+        private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de encriptación AES
 
         public FormProyectos()
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
+        }
 
+        // Evento Form_Load: Se ejecuta cuando el formulario se carga
+        private void FormProyectos_Load(object sender, EventArgs e)
+        {
             // Cargar los usuarios (solo desarrolladores) al iniciar el formulario
             CargarUsuariosDesdeJson();
             CargarUsuariosDesarrolladores();
         }
 
-        private void FormProyectos_Load(object sender, EventArgs e)
-        {
-            // Aquí puedes realizar acciones cuando el formulario cargue si es necesario
-        }
-
-        // Método para cargar usuarios desde el archivo JSON
-        // Método para cargar usuarios desde el archivo JSON
+        // Método para cargar usuarios desde el archivo JSON (desencriptando el archivo)
         private void CargarUsuariosDesdeJson()
         {
             try
@@ -39,11 +40,14 @@ namespace GestionProyectoEscritorio
                 // Verificar si el archivo existe
                 if (File.Exists(rutaArchivo))
                 {
-                    // Leer el contenido del archivo
-                    string json = File.ReadAllText(rutaArchivo);
+                    // Leer el contenido del archivo (JSON encriptado)
+                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
+
+                    // Desencriptar el JSON
+                    string jsonDesencriptado = DesencriptarJson(jsonEncriptado);
 
                     // Deserializar el JSON en la lista de usuarios
-                    listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(json) ?? new List<Usuario>();
+                    listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonDesencriptado) ?? new List<Usuario>();
                 }
             }
             catch (Exception ex)
@@ -51,6 +55,29 @@ namespace GestionProyectoEscritorio
                 // Mostrar un mensaje en caso de error
                 MessageBox.Show($"Error al cargar usuarios desde JSON: {ex.Message}",
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Método para desencriptar el JSON usando AES
+        private string DesencriptarJson(string jsonEncriptado)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(jsonEncriptado)))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd(); // Retornar el JSON desencriptado
+                        }
+                    }
+                }
             }
         }
 
@@ -130,14 +157,19 @@ namespace GestionProyectoEscritorio
             return texto.Replace(Environment.NewLine, ", ").Replace("\n", ", ").Trim();
         }
 
-        // Método para guardar la lista de proyectos en un archivo JSON
+        // Método para guardar la lista de proyectos en un archivo JSON encriptado
         private void GuardarProyectosEnJson()
         {
             try
             {
                 string rutaArchivo = "proyectos.json";
                 string json = JsonConvert.SerializeObject(listaProyectos, Formatting.Indented);
-                File.WriteAllText(rutaArchivo, json);
+
+                // Encriptar el JSON antes de guardarlo
+                string jsonEncriptado = EncriptarJson(json);
+
+                // Guardar el JSON encriptado en el archivo
+                File.WriteAllText(rutaArchivo, jsonEncriptado);
             }
             catch (Exception ex)
             {
@@ -145,6 +177,30 @@ namespace GestionProyectoEscritorio
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // Método para encriptar el JSON usando AES
+        private string EncriptarJson(string json)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
+                        }
+                    }
+                    // Retornar el JSON encriptado en formato Base64
+                    return Convert.ToBase64String(msEncrypt.ToArray());
+                }
+            }
+        }
     }
 }
-
