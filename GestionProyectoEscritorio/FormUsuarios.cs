@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO; // Para trabajar con archivos
+using System.Security.Cryptography; // Para encriptación
+using System.Text; // Para trabajar con cadenas y bytes
 using System.Windows.Forms;
 using Newtonsoft.Json; // Importar la biblioteca Newtonsoft.Json
 
@@ -9,6 +11,8 @@ namespace GestionProyectoEscritorio
     public partial class FormUsuarios : Form
     {
         private List<Usuario> listaUsuarios = new List<Usuario>(); // Lista para almacenar los usuarios
+
+        private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de 16 caracteres para AES
 
         public FormUsuarios()
         {
@@ -34,18 +38,29 @@ namespace GestionProyectoEscritorio
                 return;
             }
 
+            // Verificar si el usuario ya existe
+            if (listaUsuarios.Exists(u => u.Nombre == nombreUsuario))
+            {
+                MessageBox.Show("El nombre de usuario ya existe. Por favor, elige otro.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Encriptar la contraseña
+            string contrasenaEncriptada = EncriptarContrasena(contrasena);
+
             // Crear un objeto para almacenar los datos
             Usuario nuevoUsuario = new Usuario
             {
                 Nombre = nombreUsuario,
-                Contrasena = contrasena,
+                Contrasena = contrasenaEncriptada,
                 EsDesarrollador = esDesarrollador
             };
 
             // Agregar a la lista de usuarios
             listaUsuarios.Add(nuevoUsuario);
 
-            // Guardar en un archivo JSON
+            // Guardar en un archivo JSON encriptado
             GuardarUsuariosEnJson();
 
             // Confirmar creación
@@ -64,6 +79,7 @@ namespace GestionProyectoEscritorio
             this.Close();
         }
 
+        // Método para guardar el archivo JSON encriptado
         private void GuardarUsuariosEnJson()
         {
             try
@@ -74,8 +90,11 @@ namespace GestionProyectoEscritorio
                 // Serializar la lista de usuarios a JSON usando Newtonsoft.Json
                 string json = JsonConvert.SerializeObject(listaUsuarios, Formatting.Indented);
 
-                // Guardar el JSON en el archivo
-                File.WriteAllText(rutaArchivo, json);
+                // Encriptar el JSON antes de guardarlo
+                string jsonEncriptado = EncriptarJson(json);
+
+                // Guardar el JSON encriptado en el archivo
+                File.WriteAllText(rutaArchivo, jsonEncriptado);
             }
             catch (Exception ex)
             {
@@ -85,6 +104,31 @@ namespace GestionProyectoEscritorio
             }
         }
 
+        // Método para encriptar el JSON usando AES
+        private string EncriptarJson(string json)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(json); // Escribir el JSON en el flujo cifrado
+                        }
+                    }
+                    return Convert.ToBase64String(msEncrypt.ToArray()); // Retornar el JSON encriptado como Base64
+                }
+            }
+        }
+
+        // Método para cargar y desencriptar el archivo JSON
         private void CargarUsuariosDesdeJson()
         {
             try
@@ -95,8 +139,11 @@ namespace GestionProyectoEscritorio
                 // Verificar si el archivo existe
                 if (File.Exists(rutaArchivo))
                 {
-                    // Leer el contenido del archivo
-                    string json = File.ReadAllText(rutaArchivo);
+                    // Leer el contenido del archivo (JSON encriptado)
+                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
+
+                    // Desencriptar el JSON
+                    string json = DesencriptarJson(jsonEncriptado);
 
                     // Deserializar el JSON en la lista de usuarios
                     listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(json) ?? new List<Usuario>();
@@ -110,10 +157,56 @@ namespace GestionProyectoEscritorio
             }
         }
 
+        // Método para desencriptar el JSON usando AES
+        private string DesencriptarJson(string jsonEncriptado)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(jsonEncriptado)))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd(); // Retornar el JSON desencriptado
+                        }
+                    }
+                }
+            }
+        }
+
         private void FormUsuarios_Load(object sender, EventArgs e)
         {
+            this.textBoxContrasenaUsuario.UseSystemPasswordChar = true;
+        }
 
+        // Método para encriptar la contraseña
+        private string EncriptarContrasena(string contrasena)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(contrasena); // Escribir la contraseña en el flujo cifrado
+                        }
+                    }
+                    return Convert.ToBase64String(msEncrypt.ToArray()); // Retornar la contraseña encriptada como Base64
+                }
+            }
         }
     }
-
 }
