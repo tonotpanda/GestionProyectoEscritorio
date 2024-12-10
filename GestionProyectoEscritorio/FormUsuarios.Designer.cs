@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormUsuarios));
             this.labelNombre = new System.Windows.Forms.Label();
             this.textBoxNombreUsuario = new System.Windows.Forms.TextBox();
             this.textBoxContrasenaUsuario = new System.Windows.Forms.TextBox();
@@ -50,7 +51,7 @@
             // textBoxNombreUsuario
             // 
             this.textBoxNombreUsuario.Location = new System.Drawing.Point(217, 44);
-            this.textBoxNombreUsuario.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxNombreUsuario.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxNombreUsuario.Name = "textBoxNombreUsuario";
             this.textBoxNombreUsuario.Size = new System.Drawing.Size(173, 20);
             this.textBoxNombreUsuario.TabIndex = 1;
@@ -58,7 +59,7 @@
             // textBoxContrasenaUsuario
             // 
             this.textBoxContrasenaUsuario.Location = new System.Drawing.Point(217, 85);
-            this.textBoxContrasenaUsuario.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxContrasenaUsuario.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxContrasenaUsuario.Name = "textBoxContrasenaUsuario";
             this.textBoxContrasenaUsuario.Size = new System.Drawing.Size(173, 20);
             this.textBoxContrasenaUsuario.TabIndex = 2;
@@ -87,7 +88,7 @@
             // 
             this.checkBoxDesarrollador.AutoSize = true;
             this.checkBoxDesarrollador.Location = new System.Drawing.Point(217, 132);
-            this.checkBoxDesarrollador.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxDesarrollador.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxDesarrollador.Name = "checkBoxDesarrollador";
             this.checkBoxDesarrollador.Size = new System.Drawing.Size(88, 17);
             this.checkBoxDesarrollador.TabIndex = 5;
@@ -97,7 +98,7 @@
             // btnCrearUsuario
             // 
             this.btnCrearUsuario.Location = new System.Drawing.Point(217, 180);
-            this.btnCrearUsuario.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnCrearUsuario.Margin = new System.Windows.Forms.Padding(2);
             this.btnCrearUsuario.Name = "btnCrearUsuario";
             this.btnCrearUsuario.Size = new System.Drawing.Size(111, 24);
             this.btnCrearUsuario.TabIndex = 6;
@@ -117,9 +118,10 @@
             this.Controls.Add(this.textBoxContrasenaUsuario);
             this.Controls.Add(this.textBoxNombreUsuario);
             this.Controls.Add(this.labelNombre);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "FormUsuarios";
-            this.Text = "FormUsuarios";
+            this.Text = "Usuarios";
             this.Load += new System.EventHandler(this.FormUsuarios_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

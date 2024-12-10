@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnUsuarios = new System.Windows.Forms.Button();
             this.btnProyectos = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
@@ -35,9 +36,10 @@
             // 
             // btnUsuarios
             // 
-            this.btnUsuarios.Location = new System.Drawing.Point(287, 118);
+            this.btnUsuarios.Location = new System.Drawing.Point(215, 96);
+            this.btnUsuarios.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnUsuarios.Name = "btnUsuarios";
-            this.btnUsuarios.Size = new System.Drawing.Size(229, 40);
+            this.btnUsuarios.Size = new System.Drawing.Size(172, 32);
             this.btnUsuarios.TabIndex = 0;
             this.btnUsuarios.Text = "Gestión Usuarios";
             this.btnUsuarios.UseVisualStyleBackColor = true;
@@ -45,9 +47,10 @@
             // 
             // btnProyectos
             // 
-            this.btnProyectos.Location = new System.Drawing.Point(287, 183);
+            this.btnProyectos.Location = new System.Drawing.Point(215, 149);
+            this.btnProyectos.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnProyectos.Name = "btnProyectos";
-            this.btnProyectos.Size = new System.Drawing.Size(229, 40);
+            this.btnProyectos.Size = new System.Drawing.Size(172, 32);
             this.btnProyectos.TabIndex = 1;
             this.btnProyectos.Text = "Gestión Proyectos";
             this.btnProyectos.UseVisualStyleBackColor = true;
@@ -55,9 +58,10 @@
             // 
             // btnSalir
             // 
-            this.btnSalir.Location = new System.Drawing.Point(287, 250);
+            this.btnSalir.Location = new System.Drawing.Point(215, 203);
+            this.btnSalir.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSalir.Name = "btnSalir";
-            this.btnSalir.Size = new System.Drawing.Size(229, 40);
+            this.btnSalir.Size = new System.Drawing.Size(172, 32);
             this.btnSalir.TabIndex = 2;
             this.btnSalir.Text = "Salir";
             this.btnSalir.UseVisualStyleBackColor = true;
@@ -65,14 +69,16 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(600, 366);
             this.Controls.Add(this.btnSalir);
             this.Controls.Add(this.btnProyectos);
             this.Controls.Add(this.btnUsuarios);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Gestor Proyectos";
             this.ResumeLayout(false);
 
         }

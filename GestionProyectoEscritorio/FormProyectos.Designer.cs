@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProyectos));
             this.labelNombreProyecto = new System.Windows.Forms.Label();
             this.labelFechaInicio = new System.Windows.Forms.Label();
             this.labelFechaFin = new System.Windows.Forms.Label();
@@ -46,92 +47,102 @@
             // labelNombreProyecto
             // 
             this.labelNombreProyecto.AutoSize = true;
-            this.labelNombreProyecto.Location = new System.Drawing.Point(217, 48);
+            this.labelNombreProyecto.Location = new System.Drawing.Point(163, 39);
+            this.labelNombreProyecto.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelNombreProyecto.Name = "labelNombreProyecto";
-            this.labelNombreProyecto.Size = new System.Drawing.Size(112, 16);
+            this.labelNombreProyecto.Size = new System.Drawing.Size(88, 13);
             this.labelNombreProyecto.TabIndex = 0;
             this.labelNombreProyecto.Text = "Nombre proyecto";
             // 
             // labelFechaInicio
             // 
             this.labelFechaInicio.AutoSize = true;
-            this.labelFechaInicio.Location = new System.Drawing.Point(217, 87);
+            this.labelFechaInicio.Location = new System.Drawing.Point(163, 71);
+            this.labelFechaInicio.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelFechaInicio.Name = "labelFechaInicio";
-            this.labelFechaInicio.Size = new System.Drawing.Size(79, 16);
+            this.labelFechaInicio.Size = new System.Drawing.Size(64, 13);
             this.labelFechaInicio.TabIndex = 1;
             this.labelFechaInicio.Text = "Fecha inicio";
             // 
             // labelFechaFin
             // 
             this.labelFechaFin.AutoSize = true;
-            this.labelFechaFin.Location = new System.Drawing.Point(217, 127);
+            this.labelFechaFin.Location = new System.Drawing.Point(163, 103);
+            this.labelFechaFin.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelFechaFin.Name = "labelFechaFin";
-            this.labelFechaFin.Size = new System.Drawing.Size(61, 16);
+            this.labelFechaFin.Size = new System.Drawing.Size(51, 13);
             this.labelFechaFin.TabIndex = 2;
             this.labelFechaFin.Text = "Fecha fin";
             // 
             // labelAgregarUsuarios
             // 
             this.labelAgregarUsuarios.AutoSize = true;
-            this.labelAgregarUsuarios.Location = new System.Drawing.Point(217, 178);
+            this.labelAgregarUsuarios.Location = new System.Drawing.Point(163, 145);
+            this.labelAgregarUsuarios.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelAgregarUsuarios.Name = "labelAgregarUsuarios";
-            this.labelAgregarUsuarios.Size = new System.Drawing.Size(61, 16);
+            this.labelAgregarUsuarios.Size = new System.Drawing.Size(48, 13);
             this.labelAgregarUsuarios.TabIndex = 3;
             this.labelAgregarUsuarios.Text = "Usuarios";
             // 
             // textBoxNombreProyecto
             // 
-            this.textBoxNombreProyecto.Location = new System.Drawing.Point(365, 41);
+            this.textBoxNombreProyecto.Location = new System.Drawing.Point(274, 33);
+            this.textBoxNombreProyecto.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textBoxNombreProyecto.Name = "textBoxNombreProyecto";
-            this.textBoxNombreProyecto.Size = new System.Drawing.Size(275, 22);
+            this.textBoxNombreProyecto.Size = new System.Drawing.Size(207, 20);
             this.textBoxNombreProyecto.TabIndex = 4;
             // 
             // dateTimePickerFechaInicio
             // 
-            this.dateTimePickerFechaInicio.Location = new System.Drawing.Point(365, 87);
+            this.dateTimePickerFechaInicio.Location = new System.Drawing.Point(274, 71);
+            this.dateTimePickerFechaInicio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dateTimePickerFechaInicio.Name = "dateTimePickerFechaInicio";
-            this.dateTimePickerFechaInicio.Size = new System.Drawing.Size(275, 22);
+            this.dateTimePickerFechaInicio.Size = new System.Drawing.Size(207, 20);
             this.dateTimePickerFechaInicio.TabIndex = 5;
             // 
             // dateTimePickerFechaFin
             // 
-            this.dateTimePickerFechaFin.Location = new System.Drawing.Point(365, 127);
+            this.dateTimePickerFechaFin.Location = new System.Drawing.Point(274, 103);
+            this.dateTimePickerFechaFin.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dateTimePickerFechaFin.Name = "dateTimePickerFechaFin";
-            this.dateTimePickerFechaFin.Size = new System.Drawing.Size(275, 22);
+            this.dateTimePickerFechaFin.Size = new System.Drawing.Size(207, 20);
             this.dateTimePickerFechaFin.TabIndex = 6;
             // 
             // listBoxUsuarios
             // 
             this.listBoxUsuarios.FormattingEnabled = true;
-            this.listBoxUsuarios.ItemHeight = 16;
-            this.listBoxUsuarios.Location = new System.Drawing.Point(365, 178);
+            this.listBoxUsuarios.Location = new System.Drawing.Point(274, 145);
+            this.listBoxUsuarios.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.listBoxUsuarios.Name = "listBoxUsuarios";
-            this.listBoxUsuarios.Size = new System.Drawing.Size(275, 116);
+            this.listBoxUsuarios.Size = new System.Drawing.Size(207, 95);
             this.listBoxUsuarios.TabIndex = 7;
             // 
             // labelTareas
             // 
             this.labelTareas.AutoSize = true;
-            this.labelTareas.Location = new System.Drawing.Point(220, 322);
+            this.labelTareas.Location = new System.Drawing.Point(165, 262);
+            this.labelTareas.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelTareas.Name = "labelTareas";
-            this.labelTareas.Size = new System.Drawing.Size(51, 16);
+            this.labelTareas.Size = new System.Drawing.Size(40, 13);
             this.labelTareas.TabIndex = 9;
             this.labelTareas.Text = "Tareas";
             // 
             // labelSubTareas
             // 
             this.labelSubTareas.AutoSize = true;
-            this.labelSubTareas.Location = new System.Drawing.Point(220, 470);
+            this.labelSubTareas.Location = new System.Drawing.Point(165, 382);
+            this.labelSubTareas.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelSubTareas.Name = "labelSubTareas";
-            this.labelSubTareas.Size = new System.Drawing.Size(69, 16);
+            this.labelSubTareas.Size = new System.Drawing.Size(55, 13);
             this.labelSubTareas.TabIndex = 10;
             this.labelSubTareas.Text = "Subtareas";
             // 
             // btnGuardarProyecto
             // 
-            this.btnGuardarProyecto.Location = new System.Drawing.Point(338, 628);
+            this.btnGuardarProyecto.Location = new System.Drawing.Point(254, 510);
+            this.btnGuardarProyecto.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnGuardarProyecto.Name = "btnGuardarProyecto";
-            this.btnGuardarProyecto.Size = new System.Drawing.Size(107, 36);
+            this.btnGuardarProyecto.Size = new System.Drawing.Size(80, 29);
             this.btnGuardarProyecto.TabIndex = 12;
             this.btnGuardarProyecto.Text = "Guardar";
             this.btnGuardarProyecto.UseVisualStyleBackColor = true;
@@ -139,25 +150,27 @@
             // 
             // richTextBoxTareas
             // 
-            this.richTextBoxTareas.Location = new System.Drawing.Point(365, 322);
+            this.richTextBoxTareas.Location = new System.Drawing.Point(274, 262);
+            this.richTextBoxTareas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.richTextBoxTareas.Name = "richTextBoxTareas";
-            this.richTextBoxTareas.Size = new System.Drawing.Size(275, 116);
+            this.richTextBoxTareas.Size = new System.Drawing.Size(207, 95);
             this.richTextBoxTareas.TabIndex = 13;
             this.richTextBoxTareas.Text = "";
             // 
             // richTextBoxSubtareas
             // 
-            this.richTextBoxSubtareas.Location = new System.Drawing.Point(365, 470);
+            this.richTextBoxSubtareas.Location = new System.Drawing.Point(274, 382);
+            this.richTextBoxSubtareas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.richTextBoxSubtareas.Name = "richTextBoxSubtareas";
-            this.richTextBoxSubtareas.Size = new System.Drawing.Size(275, 116);
+            this.richTextBoxSubtareas.Size = new System.Drawing.Size(207, 95);
             this.richTextBoxSubtareas.TabIndex = 14;
             this.richTextBoxSubtareas.Text = "";
             // 
             // FormProyectos
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 736);
+            this.ClientSize = new System.Drawing.Size(600, 598);
             this.Controls.Add(this.richTextBoxSubtareas);
             this.Controls.Add(this.richTextBoxTareas);
             this.Controls.Add(this.btnGuardarProyecto);
@@ -171,8 +184,10 @@
             this.Controls.Add(this.labelFechaFin);
             this.Controls.Add(this.labelFechaInicio);
             this.Controls.Add(this.labelNombreProyecto);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "FormProyectos";
-            this.Text = "FormProyectos";
+            this.Text = "Proyectos";
             this.ResumeLayout(false);
             this.PerformLayout();
 
