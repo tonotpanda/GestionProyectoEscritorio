@@ -13,6 +13,7 @@ namespace GestionProyectoEscritorio
         private List<Usuario> listaUsuarios = new List<Usuario>(); // Lista para almacenar los usuarios
 
         private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de 16 caracteres para AES
+        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV invertido (16 bytes)
 
         public FormUsuarios()
         {
@@ -110,12 +111,15 @@ namespace GestionProyectoEscritorio
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
-                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+                aesAlg.IV = IVPersonalizado; // Usar el IV personalizado invertido
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
+                    // Guardamos primero el IV antes de los datos encriptados
+                    msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
+
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
@@ -123,6 +127,7 @@ namespace GestionProyectoEscritorio
                             swEncrypt.Write(json); // Escribir el JSON en el flujo cifrado
                         }
                     }
+
                     return Convert.ToBase64String(msEncrypt.ToArray()); // Retornar el JSON encriptado como Base64
                 }
             }
@@ -163,11 +168,19 @@ namespace GestionProyectoEscritorio
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
-                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+                aesAlg.IV = IVPersonalizado; // Usar el IV personalizado invertido
+
+                byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
+
+                // Extraemos el IV de los primeros 16 bytes (aunque en este caso, estamos usando un IV fijo)
+                byte[] iv = new byte[16];
+                Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
+
+                aesAlg.IV = iv;
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(jsonEncriptado)))
+                using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
@@ -191,12 +204,15 @@ namespace GestionProyectoEscritorio
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
-                aesAlg.IV = new byte[16]; // Inicialización con un IV de 16 bytes (todo 0s)
+                aesAlg.IV = IVPersonalizado; // Usar el IV personalizado invertido
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
+                    // Guardamos primero el IV antes de los datos encriptados
+                    msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
+
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
@@ -204,6 +220,7 @@ namespace GestionProyectoEscritorio
                             swEncrypt.Write(contrasena); // Escribir la contraseña en el flujo cifrado
                         }
                     }
+
                     return Convert.ToBase64String(msEncrypt.ToArray()); // Retornar la contraseña encriptada como Base64
                 }
             }

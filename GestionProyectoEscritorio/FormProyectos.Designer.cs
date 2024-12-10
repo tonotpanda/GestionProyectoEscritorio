@@ -135,7 +135,7 @@
             this.btnGuardarProyecto.TabIndex = 12;
             this.btnGuardarProyecto.Text = "Guardar";
             this.btnGuardarProyecto.UseVisualStyleBackColor = true;
-            this.btnGuardarProyecto.Click += new System.EventHandler(this.btnGuardarProyecto_Click);
+            this.btnGuardarProyecto.Click += new System.EventHandler(this.btnCrearProyecto_Click);
             // 
             // richTextBoxTareas
             // 
@@ -173,7 +173,6 @@
             this.Controls.Add(this.labelNombreProyecto);
             this.Name = "FormProyectos";
             this.Text = "FormProyectos";
-            this.Load += new System.EventHandler(this.FormProyectos_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
