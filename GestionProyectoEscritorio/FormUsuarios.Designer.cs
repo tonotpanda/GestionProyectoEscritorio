@@ -41,11 +41,12 @@
             // labelNombre
             // 
             this.labelNombre.AutoSize = true;
+            this.labelNombre.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelNombre.Location = new System.Drawing.Point(187, 74);
             this.labelNombre.Name = "labelNombre";
-            this.labelNombre.Size = new System.Drawing.Size(144, 21);
+            this.labelNombre.Size = new System.Drawing.Size(136, 19);
             this.labelNombre.TabIndex = 0;
-            this.labelNombre.Text = "Nombre usuario:";
+            this.labelNombre.Text = "Nombre usuario";
             // 
             // textBoxNombreUsuario
             // 
@@ -64,18 +65,20 @@
             // labelContrasena
             // 
             this.labelContrasena.AutoSize = true;
+            this.labelContrasena.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelContrasena.Location = new System.Drawing.Point(187, 142);
             this.labelContrasena.Name = "labelContrasena";
-            this.labelContrasena.Size = new System.Drawing.Size(162, 21);
+            this.labelContrasena.Size = new System.Drawing.Size(162, 19);
             this.labelContrasena.TabIndex = 3;
             this.labelContrasena.Text = "Contraseña usuario";
             // 
             // labelDesarrollador
             // 
             this.labelDesarrollador.AutoSize = true;
+            this.labelDesarrollador.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelDesarrollador.Location = new System.Drawing.Point(187, 213);
             this.labelDesarrollador.Name = "labelDesarrollador";
-            this.labelDesarrollador.Size = new System.Drawing.Size(118, 21);
+            this.labelDesarrollador.Size = new System.Drawing.Size(118, 19);
             this.labelDesarrollador.TabIndex = 4;
             this.labelDesarrollador.Text = "Desarrollador";
             // 

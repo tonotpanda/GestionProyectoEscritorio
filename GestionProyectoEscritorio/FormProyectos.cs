@@ -186,5 +186,9 @@ namespace GestionProyectoEscritorio
             }
         }
 
+        private void labelFechaInicio_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

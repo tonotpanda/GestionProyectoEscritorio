@@ -47,36 +47,41 @@
             // labelNombreProyecto
             // 
             this.labelNombreProyecto.AutoSize = true;
-            this.labelNombreProyecto.Location = new System.Drawing.Point(272, 63);
+            this.labelNombreProyecto.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNombreProyecto.Location = new System.Drawing.Point(272, 60);
             this.labelNombreProyecto.Name = "labelNombreProyecto";
-            this.labelNombreProyecto.Size = new System.Drawing.Size(149, 21);
+            this.labelNombreProyecto.Size = new System.Drawing.Size(146, 19);
             this.labelNombreProyecto.TabIndex = 0;
             this.labelNombreProyecto.Text = "Nombre proyecto";
             // 
             // labelFechaInicio
             // 
             this.labelFechaInicio.AutoSize = true;
-            this.labelFechaInicio.Location = new System.Drawing.Point(272, 115);
+            this.labelFechaInicio.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFechaInicio.Location = new System.Drawing.Point(272, 121);
             this.labelFechaInicio.Name = "labelFechaInicio";
-            this.labelFechaInicio.Size = new System.Drawing.Size(103, 21);
+            this.labelFechaInicio.Size = new System.Drawing.Size(106, 19);
             this.labelFechaInicio.TabIndex = 1;
             this.labelFechaInicio.Text = "Fecha inicio";
+            this.labelFechaInicio.Click += new System.EventHandler(this.labelFechaInicio_Click);
             // 
             // labelFechaFin
             // 
             this.labelFechaFin.AutoSize = true;
-            this.labelFechaFin.Location = new System.Drawing.Point(272, 166);
+            this.labelFechaFin.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFechaFin.Location = new System.Drawing.Point(272, 173);
             this.labelFechaFin.Name = "labelFechaFin";
-            this.labelFechaFin.Size = new System.Drawing.Size(82, 21);
+            this.labelFechaFin.Size = new System.Drawing.Size(82, 19);
             this.labelFechaFin.TabIndex = 2;
             this.labelFechaFin.Text = "Fecha fin";
             // 
             // labelAgregarUsuarios
             // 
             this.labelAgregarUsuarios.AutoSize = true;
+            this.labelAgregarUsuarios.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelAgregarUsuarios.Location = new System.Drawing.Point(272, 234);
             this.labelAgregarUsuarios.Name = "labelAgregarUsuarios";
-            this.labelAgregarUsuarios.Size = new System.Drawing.Size(79, 21);
+            this.labelAgregarUsuarios.Size = new System.Drawing.Size(77, 19);
             this.labelAgregarUsuarios.TabIndex = 3;
             this.labelAgregarUsuarios.Text = "Usuarios";
             // 
@@ -113,18 +118,20 @@
             // labelTareas
             // 
             this.labelTareas.AutoSize = true;
+            this.labelTareas.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelTareas.Location = new System.Drawing.Point(275, 423);
             this.labelTareas.Name = "labelTareas";
-            this.labelTareas.Size = new System.Drawing.Size(63, 21);
+            this.labelTareas.Size = new System.Drawing.Size(62, 19);
             this.labelTareas.TabIndex = 9;
             this.labelTareas.Text = "Tareas";
             // 
             // labelSubTareas
             // 
             this.labelSubTareas.AutoSize = true;
+            this.labelSubTareas.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelSubTareas.Location = new System.Drawing.Point(275, 617);
             this.labelSubTareas.Name = "labelSubTareas";
-            this.labelSubTareas.Size = new System.Drawing.Size(88, 21);
+            this.labelSubTareas.Size = new System.Drawing.Size(86, 19);
             this.labelSubTareas.TabIndex = 10;
             this.labelSubTareas.Text = "Subtareas";
             // 
