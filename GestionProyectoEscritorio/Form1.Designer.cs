@@ -32,6 +32,7 @@
             this.btnUsuarios = new System.Windows.Forms.Button();
             this.btnProyectos = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
+            this.btnGestionJSON = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnUsuarios
@@ -56,13 +57,23 @@
             // 
             // btnSalir
             // 
-            this.btnSalir.Location = new System.Drawing.Point(287, 281);
+            this.btnSalir.Location = new System.Drawing.Point(287, 347);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(229, 44);
             this.btnSalir.TabIndex = 2;
             this.btnSalir.Text = "Salir";
             this.btnSalir.UseVisualStyleBackColor = true;
             this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
+            // 
+            // btnGestionJSON
+            // 
+            this.btnGestionJSON.Location = new System.Drawing.Point(287, 276);
+            this.btnGestionJSON.Name = "btnGestionJSON";
+            this.btnGestionJSON.Size = new System.Drawing.Size(229, 44);
+            this.btnGestionJSON.TabIndex = 3;
+            this.btnGestionJSON.Text = "Gestión JSON";
+            this.btnGestionJSON.UseVisualStyleBackColor = true;
+            this.btnGestionJSON.Click += new System.EventHandler(this.btnGestionJSON_Click);
             // 
             // Form1
             // 
@@ -71,6 +82,7 @@
             this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(800, 507);
+            this.Controls.Add(this.btnGestionJSON);
             this.Controls.Add(this.btnSalir);
             this.Controls.Add(this.btnProyectos);
             this.Controls.Add(this.btnUsuarios);
@@ -78,6 +90,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Gestor Proyectos";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }
@@ -87,6 +100,7 @@
         private System.Windows.Forms.Button btnUsuarios;
         private System.Windows.Forms.Button btnProyectos;
         private System.Windows.Forms.Button btnSalir;
+        private System.Windows.Forms.Button btnGestionJSON;
     }
 }
 

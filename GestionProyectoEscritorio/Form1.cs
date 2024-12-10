@@ -36,5 +36,18 @@ namespace GestionProyectoEscritorio
         {
             Application.Exit();
         }
+
+        private void btnGestionJSON_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormGestionJSON gestionJSON = new FormGestionJSON();
+            gestionJSON.ShowDialog();
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

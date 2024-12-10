@@ -209,6 +209,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormProyectos";
             this.Text = "Proyectos";
+            this.Load += new System.EventHandler(this.FormProyectos_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
