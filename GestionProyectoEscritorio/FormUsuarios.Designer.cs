@@ -41,7 +41,9 @@
             // labelNombre
             // 
             this.labelNombre.AutoSize = true;
+            this.labelNombre.BackColor = System.Drawing.Color.Transparent;
             this.labelNombre.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNombre.ForeColor = System.Drawing.Color.White;
             this.labelNombre.Location = new System.Drawing.Point(187, 74);
             this.labelNombre.Name = "labelNombre";
             this.labelNombre.Size = new System.Drawing.Size(136, 19);
@@ -65,7 +67,9 @@
             // labelContrasena
             // 
             this.labelContrasena.AutoSize = true;
+            this.labelContrasena.BackColor = System.Drawing.Color.Transparent;
             this.labelContrasena.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelContrasena.ForeColor = System.Drawing.Color.White;
             this.labelContrasena.Location = new System.Drawing.Point(187, 142);
             this.labelContrasena.Name = "labelContrasena";
             this.labelContrasena.Size = new System.Drawing.Size(162, 19);
@@ -75,7 +79,9 @@
             // labelDesarrollador
             // 
             this.labelDesarrollador.AutoSize = true;
+            this.labelDesarrollador.BackColor = System.Drawing.Color.Transparent;
             this.labelDesarrollador.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDesarrollador.ForeColor = System.Drawing.Color.White;
             this.labelDesarrollador.Location = new System.Drawing.Point(187, 213);
             this.labelDesarrollador.Name = "labelDesarrollador";
             this.labelDesarrollador.Size = new System.Drawing.Size(118, 19);
@@ -85,12 +91,14 @@
             // checkBoxDesarrollador
             // 
             this.checkBoxDesarrollador.AutoSize = true;
+            this.checkBoxDesarrollador.BackColor = System.Drawing.Color.Transparent;
+            this.checkBoxDesarrollador.ForeColor = System.Drawing.Color.White;
             this.checkBoxDesarrollador.Location = new System.Drawing.Point(362, 213);
             this.checkBoxDesarrollador.Name = "checkBoxDesarrollador";
             this.checkBoxDesarrollador.Size = new System.Drawing.Size(137, 25);
             this.checkBoxDesarrollador.TabIndex = 5;
             this.checkBoxDesarrollador.Text = "Desarrollador";
-            this.checkBoxDesarrollador.UseVisualStyleBackColor = true;
+            this.checkBoxDesarrollador.UseVisualStyleBackColor = false;
             // 
             // btnCrearUsuario
             // 
@@ -106,6 +114,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(853, 460);
             this.Controls.Add(this.btnCrearUsuario);
             this.Controls.Add(this.checkBoxDesarrollador);

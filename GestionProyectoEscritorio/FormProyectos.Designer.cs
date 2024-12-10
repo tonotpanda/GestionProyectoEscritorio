@@ -47,7 +47,9 @@
             // labelNombreProyecto
             // 
             this.labelNombreProyecto.AutoSize = true;
+            this.labelNombreProyecto.BackColor = System.Drawing.Color.Transparent;
             this.labelNombreProyecto.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNombreProyecto.ForeColor = System.Drawing.Color.White;
             this.labelNombreProyecto.Location = new System.Drawing.Point(272, 60);
             this.labelNombreProyecto.Name = "labelNombreProyecto";
             this.labelNombreProyecto.Size = new System.Drawing.Size(146, 19);
@@ -57,7 +59,9 @@
             // labelFechaInicio
             // 
             this.labelFechaInicio.AutoSize = true;
+            this.labelFechaInicio.BackColor = System.Drawing.Color.Transparent;
             this.labelFechaInicio.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFechaInicio.ForeColor = System.Drawing.Color.White;
             this.labelFechaInicio.Location = new System.Drawing.Point(272, 121);
             this.labelFechaInicio.Name = "labelFechaInicio";
             this.labelFechaInicio.Size = new System.Drawing.Size(106, 19);
@@ -68,7 +72,9 @@
             // labelFechaFin
             // 
             this.labelFechaFin.AutoSize = true;
+            this.labelFechaFin.BackColor = System.Drawing.Color.Transparent;
             this.labelFechaFin.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFechaFin.ForeColor = System.Drawing.Color.White;
             this.labelFechaFin.Location = new System.Drawing.Point(272, 173);
             this.labelFechaFin.Name = "labelFechaFin";
             this.labelFechaFin.Size = new System.Drawing.Size(82, 19);
@@ -78,7 +84,9 @@
             // labelAgregarUsuarios
             // 
             this.labelAgregarUsuarios.AutoSize = true;
+            this.labelAgregarUsuarios.BackColor = System.Drawing.Color.Transparent;
             this.labelAgregarUsuarios.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAgregarUsuarios.ForeColor = System.Drawing.Color.White;
             this.labelAgregarUsuarios.Location = new System.Drawing.Point(272, 234);
             this.labelAgregarUsuarios.Name = "labelAgregarUsuarios";
             this.labelAgregarUsuarios.Size = new System.Drawing.Size(77, 19);
@@ -118,7 +126,9 @@
             // labelTareas
             // 
             this.labelTareas.AutoSize = true;
+            this.labelTareas.BackColor = System.Drawing.Color.Transparent;
             this.labelTareas.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTareas.ForeColor = System.Drawing.Color.White;
             this.labelTareas.Location = new System.Drawing.Point(275, 423);
             this.labelTareas.Name = "labelTareas";
             this.labelTareas.Size = new System.Drawing.Size(62, 19);
@@ -128,7 +138,9 @@
             // labelSubTareas
             // 
             this.labelSubTareas.AutoSize = true;
+            this.labelSubTareas.BackColor = System.Drawing.Color.Transparent;
             this.labelSubTareas.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSubTareas.ForeColor = System.Drawing.Color.White;
             this.labelSubTareas.Location = new System.Drawing.Point(275, 617);
             this.labelSubTareas.Name = "labelSubTareas";
             this.labelSubTareas.Size = new System.Drawing.Size(86, 19);
@@ -165,6 +177,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1000, 966);
             this.Controls.Add(this.richTextBoxSubtareas);
             this.Controls.Add(this.richTextBoxTareas);
