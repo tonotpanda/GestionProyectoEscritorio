@@ -36,6 +36,7 @@
             this.labelDesarrollador = new System.Windows.Forms.Label();
             this.checkBoxDesarrollador = new System.Windows.Forms.CheckBox();
             this.btnCrearUsuario = new System.Windows.Forms.Button();
+            this.btnCancelarUsuario = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelNombre
@@ -110,6 +111,16 @@
             this.btnCrearUsuario.UseVisualStyleBackColor = true;
             this.btnCrearUsuario.Click += new System.EventHandler(this.btnCrearUsuario_Click);
             // 
+            // btnCancelarUsuario
+            // 
+            this.btnCancelarUsuario.Location = new System.Drawing.Point(362, 350);
+            this.btnCancelarUsuario.Name = "btnCancelarUsuario";
+            this.btnCancelarUsuario.Size = new System.Drawing.Size(185, 39);
+            this.btnCancelarUsuario.TabIndex = 7;
+            this.btnCancelarUsuario.Text = "Cancelar";
+            this.btnCancelarUsuario.UseVisualStyleBackColor = true;
+            this.btnCancelarUsuario.Click += new System.EventHandler(this.btnCancelarUsuario_Click);
+            // 
             // FormUsuarios
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
@@ -117,6 +128,7 @@
             this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(853, 460);
+            this.Controls.Add(this.btnCancelarUsuario);
             this.Controls.Add(this.btnCrearUsuario);
             this.Controls.Add(this.checkBoxDesarrollador);
             this.Controls.Add(this.labelDesarrollador);
@@ -143,5 +155,6 @@
         private System.Windows.Forms.Label labelDesarrollador;
         private System.Windows.Forms.CheckBox checkBoxDesarrollador;
         private System.Windows.Forms.Button btnCrearUsuario;
+        private System.Windows.Forms.Button btnCancelarUsuario;
     }
 }

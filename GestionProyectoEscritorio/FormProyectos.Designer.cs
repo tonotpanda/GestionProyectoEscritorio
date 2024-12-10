@@ -42,6 +42,7 @@
             this.btnGuardarProyecto = new System.Windows.Forms.Button();
             this.richTextBoxTareas = new System.Windows.Forms.RichTextBox();
             this.richTextBoxSubtareas = new System.Windows.Forms.RichTextBox();
+            this.btnCancelarProyecto = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelNombreProyecto
@@ -173,13 +174,24 @@
             this.richTextBoxSubtareas.TabIndex = 14;
             this.richTextBoxSubtareas.Text = "";
             // 
+            // btnCancelarProyecto
+            // 
+            this.btnCancelarProyecto.Location = new System.Drawing.Point(423, 889);
+            this.btnCancelarProyecto.Name = "btnCancelarProyecto";
+            this.btnCancelarProyecto.Size = new System.Drawing.Size(133, 47);
+            this.btnCancelarProyecto.TabIndex = 15;
+            this.btnCancelarProyecto.Text = "Cancelar";
+            this.btnCancelarProyecto.UseVisualStyleBackColor = true;
+            this.btnCancelarProyecto.Click += new System.EventHandler(this.btnCancelarProyecto_Click);
+            // 
             // FormProyectos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1000, 966);
+            this.ClientSize = new System.Drawing.Size(1000, 995);
+            this.Controls.Add(this.btnCancelarProyecto);
             this.Controls.Add(this.richTextBoxSubtareas);
             this.Controls.Add(this.richTextBoxTareas);
             this.Controls.Add(this.btnGuardarProyecto);
@@ -217,5 +229,6 @@
         private System.Windows.Forms.Button btnGuardarProyecto;
         private System.Windows.Forms.RichTextBox richTextBoxTareas;
         private System.Windows.Forms.RichTextBox richTextBoxSubtareas;
+        private System.Windows.Forms.Button btnCancelarProyecto;
     }
 }
