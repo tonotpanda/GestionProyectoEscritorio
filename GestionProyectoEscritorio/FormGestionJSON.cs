@@ -6,13 +6,16 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GestionProyectoEscritorio
 {
     public partial class FormGestionJSON : Form
     {
         private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de encriptación AES
-        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV invertido de 16 bytes
+        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV de 16 bytes
+
+        private List<Proyecto> listaProyectos = new List<Proyecto>(); // Lista de proyectos
 
         public FormGestionJSON()
         {
@@ -20,11 +23,9 @@ namespace GestionProyectoEscritorio
             this.StartPosition = FormStartPosition.CenterScreen;
         }
 
-
-
+        // Cargar los proyectos desde el archivo JSON
         private void btnSeleccionarJSON_Click(object sender, EventArgs e)
         {
-            // Crear un cuadro de diálogo para seleccionar el archivo JSON
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "Archivos JSON|*.json",
@@ -35,18 +36,17 @@ namespace GestionProyectoEscritorio
             {
                 try
                 {
-                    // Leer el archivo seleccionado
                     string rutaArchivo = openFileDialog.FileName;
                     string jsonEncriptado = File.ReadAllText(rutaArchivo);
 
-                    // Desencriptar el contenido del archivo JSON
+                    // Desencriptar el JSON completo
                     string json = DesencriptarJson(jsonEncriptado);
 
-                    // Deserializar el JSON en una lista de objetos (ajustar según la estructura de datos)
-                    var datos = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json);
+                    // Deserializar el JSON en una lista de proyectos
+                    var proyectosJson = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json) ?? new List<Dictionary<string, object>>();
 
-                    // Llenar el DataGridView con los datos
-                    CargarDatosEnDataGridView(datos);
+                    // Cargar los datos en el DataGridView
+                    CargarDatosEnDataGridView(proyectosJson);
                 }
                 catch (Exception ex)
                 {
@@ -55,7 +55,7 @@ namespace GestionProyectoEscritorio
             }
         }
 
-        // Método para desencriptar el JSON
+        // Método para desencriptar el JSON completo
         private string DesencriptarJson(string jsonEncriptado)
         {
             try
@@ -79,7 +79,7 @@ namespace GestionProyectoEscritorio
                         {
                             using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                             {
-                                return srDecrypt.ReadToEnd(); // Retorna el JSON desencriptado
+                                return srDecrypt.ReadToEnd();
                             }
                         }
                     }
@@ -92,90 +92,129 @@ namespace GestionProyectoEscritorio
             }
         }
 
-        // Método para cargar los datos desencriptados en el DataGridView
-        private void CargarDatosEnDataGridView(List<Dictionary<string, object>> datos)
+        // Método para cargar los datos en el DataGridView
+        private void CargarDatosEnDataGridView(List<Dictionary<string, object>> proyectosJson)
         {
-            // Limpiar el DataGridView antes de llenarlo con nuevos datos
             dataGridViewJSON.Rows.Clear();
             dataGridViewJSON.Columns.Clear();
 
-            if (datos == null || datos.Count == 0)
+            if (proyectosJson == null || proyectosJson.Count == 0)
             {
-                MessageBox.Show("No se encontraron datos en el archivo JSON.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("No se encontraron proyectos en el archivo JSON.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Agregar las columnas dinámicamente en función de las claves de los datos
-            HashSet<string> allKeys = new HashSet<string>();
-            foreach (var item in datos)
+            // Crear columnas dinámicas basadas en las claves del primer proyecto
+            var primerasClaves = proyectosJson.FirstOrDefault();
+            if (primerasClaves != null)
             {
-                foreach (var key in item.Keys)
+                // Añadir las columnas dinámicamente
+                foreach (var clave in primerasClaves.Keys)
                 {
-                    allKeys.Add(key); // Añadir todas las claves únicas encontradas
+                    dataGridViewJSON.Columns.Add(clave, clave); // Usamos las claves del JSON como nombres de las columnas
+                }
+
+                // Llenar las filas con los datos de cada proyecto
+                foreach (var proyecto in proyectosJson)
+                {
+                    var valores = proyecto.Values.Select(v => v.ToString()).ToArray();  // Convertir los valores de cada proyecto a cadenas
+                    dataGridViewJSON.Rows.Add(valores); // Añadir la fila al DataGridView
+                }
+
+                // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
+                dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+        }
+
+        // Método para encriptar JSON
+        private string EncriptarJson(string json)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                aesAlg.IV = IVPersonalizado;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length); // Escribir el IV primero
+
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
+                        }
+                    }
+                    return Convert.ToBase64String(msEncrypt.ToArray());
                 }
             }
+        }
 
-            foreach (var key in allKeys)
+        // Método para guardar proyectos en JSON (encriptado)
+        private void GuardarProyectosEnJson()
+        {
+            try
             {
-                dataGridViewJSON.Columns.Add(key, key); // Agrega columnas con el nombre de la clave
+                string json = JsonConvert.SerializeObject(listaProyectos, Formatting.Indented);
+                string jsonEncriptado = EncriptarJson(json); // Encriptar el JSON
+                File.WriteAllText("proyectos.json", jsonEncriptado); // Guardar en el archivo
             }
-
-            // Agregar las filas con los datos
-            foreach (var item in datos)
+            catch (Exception ex)
             {
-                // Crear una lista de valores que correspondan a las columnas
-                List<object> rowValues = new List<object>();
+                MessageBox.Show($"Error al guardar proyectos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-                // Añadir los valores de las columnas para esta fila
-                foreach (var column in dataGridViewJSON.Columns)
+        // Método para manejar la eliminación de un proyecto
+        private void btnBorrar_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewJSON.SelectedRows.Count > 0)
+            {
+                try
                 {
-                    string columnName = ((DataGridViewColumn)column).Name;
-                    Console.WriteLine($"Columna encontrada: {columnName}"); // Imprime el nombre de la columna
+                    // Obtener el índice de la fila seleccionada
+                    int filaSeleccionada = dataGridViewJSON.SelectedRows[0].Index;
 
-                    if (item.ContainsKey(columnName))
+                    // Obtener el nombre del proyecto de la fila seleccionada
+                    string nombreProyecto = dataGridViewJSON.Rows[filaSeleccionada].Cells["NombreProyecto"].Value.ToString();
+
+                    // Buscar el proyecto correspondiente en la lista
+                    var proyectoAEliminar = listaProyectos.FirstOrDefault(p => p.NombreProyecto == nombreProyecto);
+
+                    if (proyectoAEliminar != null)
                     {
-                        object value = item[columnName];
+                        // Eliminar el proyecto de la lista
+                        listaProyectos.Remove(proyectoAEliminar);
 
-                        // Si la columna es "password" (o el nombre de la clave que almacena la contraseña)
-                        if (columnName.ToLower() == "password" && value != null)
-                        {
-                            // Ya no desencriptamos la contraseña, simplemente la mostramos tal cual
-                            rowValues.Add(value.ToString());
-                        }
-                        else
-                        {
-                            rowValues.Add(value);
-                        }
+                        // Eliminar la fila del DataGridView
+                        dataGridViewJSON.Rows.RemoveAt(filaSeleccionada);
+
+                        // Guardar los cambios en el archivo JSON
+                        GuardarProyectosEnJson();
+
+                        MessageBox.Show("El proyecto ha sido eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        // Redirigir a Form1
+                        this.Hide();
+                        Form1 form1 = new Form1();
+                        form1.ShowDialog();
                     }
                     else
                     {
-                        rowValues.Add(null); // Si no está presente, agregar un valor nulo
+                        MessageBox.Show("No se encontró el proyecto seleccionado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-
-                // Añadir la fila al DataGridView
-                dataGridViewJSON.Rows.Add(rowValues.ToArray());
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al eliminar el proyecto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-
-            // Ajustar automáticamente el ancho de las columnas para que ocupen todo el espacio disponible
-            dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            // Aumentar la altura de las filas para que haya más espacio entre ellas
-            dataGridViewJSON.RowTemplate.Height = 100; // Ajusta este valor para hacer las filas más grandes
-
-            // Hacer que el texto se ajuste automáticamente en las celdas
-            foreach (DataGridViewColumn column in dataGridViewJSON.Columns)
+            else
             {
-                column.DefaultCellStyle.WrapMode = DataGridViewTriState.True; // Habilitar ajuste de texto
+                MessageBox.Show("Por favor, seleccione un proyecto para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
-            // Asegurarse de que el ancho de las columnas se ajusten correctamente para que no haya "..."
-            dataGridViewJSON.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-        }
-
-        private void btnBorrar_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
