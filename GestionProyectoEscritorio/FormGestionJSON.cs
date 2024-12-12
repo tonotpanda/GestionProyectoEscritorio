@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace GestionProyectoEscritorio
 {
@@ -16,6 +15,7 @@ namespace GestionProyectoEscritorio
         private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV de 16 bytes
 
         private List<Proyecto> listaProyectos = new List<Proyecto>(); // Lista de proyectos
+        private string rutaArchivoActual = string.Empty; // Variable para almacenar la ruta del archivo cargado
 
         public FormGestionJSON()
         {
@@ -36,8 +36,8 @@ namespace GestionProyectoEscritorio
             {
                 try
                 {
-                    string rutaArchivo = openFileDialog.FileName;
-                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
+                    rutaArchivoActual = openFileDialog.FileName; // Guardamos la ruta del archivo seleccionado
+                    string jsonEncriptado = File.ReadAllText(rutaArchivoActual); // Leemos el archivo encriptado
 
                     // Desencriptar el JSON completo
                     string json = DesencriptarJson(jsonEncriptado);
@@ -117,12 +117,94 @@ namespace GestionProyectoEscritorio
                 // Llenar las filas con los datos de cada proyecto
                 foreach (var proyecto in proyectosJson)
                 {
-                    var valores = proyecto.Values.Select(v => v.ToString()).ToArray();  // Convertir los valores de cada proyecto a cadenas
-                    dataGridViewJSON.Rows.Add(valores); // Añadir la fila al DataGridView
+                    // Si existe una clave de "Contrasena", la desencriptamos
+                    if (proyecto.ContainsKey("Contrasena"))
+                    {
+                        string contrasenaEncriptada = proyecto["Contrasena"].ToString();
+                        string contrasenaDesencriptada = DesencriptarContrasena(contrasenaEncriptada);
+                        proyecto["Contrasena"] = contrasenaDesencriptada; // Actualizamos la contraseña desencriptada
+                    }
+
+                    // Convertir los valores de cada proyecto a cadenas
+                    var valores = proyecto.Values.Select(v => v.ToString()).ToArray();
+
+                    // Añadir la fila al DataGridView
+                    dataGridViewJSON.Rows.Add(valores);
                 }
 
                 // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
                 dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+        }
+
+        // Método para desencriptar la contraseña
+        private string DesencriptarContrasena(string contrasenaEncriptada)
+        {
+            try
+            {
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                    aesAlg.IV = IVPersonalizado;
+
+                    byte[] datosEncriptados = Convert.FromBase64String(contrasenaEncriptada);
+                    byte[] iv = new byte[16];
+                    Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
+
+                    aesAlg.IV = iv;
+
+                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                    using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
+                    {
+                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                        {
+                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                            {
+                                return srDecrypt.ReadToEnd(); // Devolver la contraseña desencriptada
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al desencriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
+            }
+        }
+
+        // Método para encriptar la contraseña
+        private string EncriptarContrasena(string contrasena)
+        {
+            try
+            {
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                    aesAlg.IV = IVPersonalizado;
+
+                    ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                    using (MemoryStream msEncrypt = new MemoryStream())
+                    {
+                        msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length); // Escribir el IV primero
+
+                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                        {
+                            using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                            {
+                                swEncrypt.Write(contrasena); // Escribir la contraseña en el CryptoStream
+                            }
+                        }
+                        return Convert.ToBase64String(msEncrypt.ToArray()); // Retorna la contraseña encriptada en Base64
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al encriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
             }
         }
 
@@ -157,9 +239,52 @@ namespace GestionProyectoEscritorio
         {
             try
             {
-                string json = JsonConvert.SerializeObject(listaProyectos, Formatting.Indented);
-                string jsonEncriptado = EncriptarJson(json); // Encriptar el JSON
-                File.WriteAllText("proyectos.json", jsonEncriptado); // Guardar en el archivo
+                // Convertir los datos del DataGridView de nuevo a un JSON
+                List<Dictionary<string, object>> proyectosJson = new List<Dictionary<string, object>>();
+
+                foreach (DataGridViewRow row in dataGridViewJSON.Rows)
+                {
+                    if (row.IsNewRow) continue; // Evitar agregar la nueva fila que es solo de entrada
+
+                    Dictionary<string, object> proyecto = new Dictionary<string, object>();
+                    foreach (DataGridViewColumn column in dataGridViewJSON.Columns)
+                    {
+                        // Asegurarse de capturar correctamente los valores de cada celda
+                        proyecto[column.Name] = row.Cells[column.Name].Value?.ToString() ?? string.Empty;
+                    }
+
+                    // Si existe una clave de "Contrasena", la encriptamos antes de guardar
+                    if (proyecto.ContainsKey("Contrasena"))
+                    {
+                        string contrasena = proyecto["Contrasena"].ToString();
+                        proyecto["Contrasena"] = EncriptarContrasena(contrasena); // Encriptar la contraseña
+                    }
+
+                    proyectosJson.Add(proyecto);
+                }
+
+                // Serializar el JSON en texto
+                string json = JsonConvert.SerializeObject(proyectosJson, Formatting.Indented);
+
+                // Encriptar el JSON
+                string jsonEncriptado = EncriptarJson(json);
+
+                // Guardar el archivo JSON encriptado en el archivo original
+                if (!string.IsNullOrEmpty(rutaArchivoActual)) // Asegurarse de que la ruta esté definida
+                {
+                    File.WriteAllText(rutaArchivoActual, jsonEncriptado); // Sobrescribir el archivo original con los datos encriptados
+
+                    MessageBox.Show("Los proyectos se han guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("No se ha cargado ningún archivo para guardar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // Regresar a Form1
+                this.Close(); // Cierra FormGestionJSON
+                Form1 form1 = new Form1(); // Crear una nueva instancia de Form1
+                form1.Show(); // Mostrar Form1
             }
             catch (Exception ex)
             {
@@ -167,54 +292,26 @@ namespace GestionProyectoEscritorio
             }
         }
 
-        // Método para manejar la eliminación de un proyecto
+        // Evento del botón Guardar
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            GuardarProyectosEnJson();
+        }
+
+        // Evento del botón Borrar
         private void btnBorrar_Click(object sender, EventArgs e)
         {
-            if (dataGridViewJSON.SelectedRows.Count > 0)
+            foreach (DataGridViewRow row in dataGridViewJSON.SelectedRows)
             {
-                try
-                {
-                    // Obtener el índice de la fila seleccionada
-                    int filaSeleccionada = dataGridViewJSON.SelectedRows[0].Index;
-
-                    // Obtener el nombre del proyecto de la fila seleccionada
-                    string nombreProyecto = dataGridViewJSON.Rows[filaSeleccionada].Cells["NombreProyecto"].Value.ToString();
-
-                    // Buscar el proyecto correspondiente en la lista
-                    var proyectoAEliminar = listaProyectos.FirstOrDefault(p => p.NombreProyecto == nombreProyecto);
-
-                    if (proyectoAEliminar != null)
-                    {
-                        // Eliminar el proyecto de la lista
-                        listaProyectos.Remove(proyectoAEliminar);
-
-                        // Eliminar la fila del DataGridView
-                        dataGridViewJSON.Rows.RemoveAt(filaSeleccionada);
-
-                        // Guardar los cambios en el archivo JSON
-                        GuardarProyectosEnJson();
-
-                        MessageBox.Show("El proyecto ha sido eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Redirigir a Form1
-                        this.Hide();
-                        Form1 form1 = new Form1();
-                        form1.ShowDialog();
-                    }
-                    else
-                    {
-                        MessageBox.Show("No se encontró el proyecto seleccionado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al eliminar el proyecto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                dataGridViewJSON.Rows.Remove(row); // Eliminar las filas seleccionadas
             }
-            else
-            {
-                MessageBox.Show("Por favor, seleccione un proyecto para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+        }
+
+        private void btnCancelarJSON_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 form1 = new Form1();
+            form1.ShowDialog();
         }
     }
 }

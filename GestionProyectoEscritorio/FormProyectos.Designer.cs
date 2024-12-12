@@ -53,7 +53,7 @@
             this.labelNombreProyecto.ForeColor = System.Drawing.Color.White;
             this.labelNombreProyecto.Location = new System.Drawing.Point(272, 60);
             this.labelNombreProyecto.Name = "labelNombreProyecto";
-            this.labelNombreProyecto.Size = new System.Drawing.Size(146, 19);
+            this.labelNombreProyecto.Size = new System.Drawing.Size(179, 24);
             this.labelNombreProyecto.TabIndex = 0;
             this.labelNombreProyecto.Text = "Nombre proyecto";
             // 
@@ -65,7 +65,7 @@
             this.labelFechaInicio.ForeColor = System.Drawing.Color.White;
             this.labelFechaInicio.Location = new System.Drawing.Point(272, 121);
             this.labelFechaInicio.Name = "labelFechaInicio";
-            this.labelFechaInicio.Size = new System.Drawing.Size(106, 19);
+            this.labelFechaInicio.Size = new System.Drawing.Size(131, 24);
             this.labelFechaInicio.TabIndex = 1;
             this.labelFechaInicio.Text = "Fecha inicio";
             this.labelFechaInicio.Click += new System.EventHandler(this.labelFechaInicio_Click);
@@ -78,7 +78,7 @@
             this.labelFechaFin.ForeColor = System.Drawing.Color.White;
             this.labelFechaFin.Location = new System.Drawing.Point(272, 173);
             this.labelFechaFin.Name = "labelFechaFin";
-            this.labelFechaFin.Size = new System.Drawing.Size(82, 19);
+            this.labelFechaFin.Size = new System.Drawing.Size(102, 24);
             this.labelFechaFin.TabIndex = 2;
             this.labelFechaFin.Text = "Fecha fin";
             // 
@@ -90,7 +90,7 @@
             this.labelAgregarUsuarios.ForeColor = System.Drawing.Color.White;
             this.labelAgregarUsuarios.Location = new System.Drawing.Point(272, 234);
             this.labelAgregarUsuarios.Name = "labelAgregarUsuarios";
-            this.labelAgregarUsuarios.Size = new System.Drawing.Size(77, 19);
+            this.labelAgregarUsuarios.Size = new System.Drawing.Size(96, 24);
             this.labelAgregarUsuarios.TabIndex = 3;
             this.labelAgregarUsuarios.Text = "Usuarios";
             // 
@@ -98,30 +98,30 @@
             // 
             this.textBoxNombreProyecto.Location = new System.Drawing.Point(457, 53);
             this.textBoxNombreProyecto.Name = "textBoxNombreProyecto";
-            this.textBoxNombreProyecto.Size = new System.Drawing.Size(342, 28);
+            this.textBoxNombreProyecto.Size = new System.Drawing.Size(342, 30);
             this.textBoxNombreProyecto.TabIndex = 4;
             // 
             // dateTimePickerFechaInicio
             // 
             this.dateTimePickerFechaInicio.Location = new System.Drawing.Point(457, 115);
             this.dateTimePickerFechaInicio.Name = "dateTimePickerFechaInicio";
-            this.dateTimePickerFechaInicio.Size = new System.Drawing.Size(342, 28);
+            this.dateTimePickerFechaInicio.Size = new System.Drawing.Size(342, 30);
             this.dateTimePickerFechaInicio.TabIndex = 5;
             // 
             // dateTimePickerFechaFin
             // 
             this.dateTimePickerFechaFin.Location = new System.Drawing.Point(457, 166);
             this.dateTimePickerFechaFin.Name = "dateTimePickerFechaFin";
-            this.dateTimePickerFechaFin.Size = new System.Drawing.Size(342, 28);
+            this.dateTimePickerFechaFin.Size = new System.Drawing.Size(342, 30);
             this.dateTimePickerFechaFin.TabIndex = 6;
             // 
             // listBoxUsuarios
             // 
             this.listBoxUsuarios.FormattingEnabled = true;
-            this.listBoxUsuarios.ItemHeight = 21;
+            this.listBoxUsuarios.ItemHeight = 25;
             this.listBoxUsuarios.Location = new System.Drawing.Point(457, 234);
             this.listBoxUsuarios.Name = "listBoxUsuarios";
-            this.listBoxUsuarios.Size = new System.Drawing.Size(342, 151);
+            this.listBoxUsuarios.Size = new System.Drawing.Size(342, 129);
             this.listBoxUsuarios.TabIndex = 7;
             // 
             // labelTareas
@@ -132,7 +132,7 @@
             this.labelTareas.ForeColor = System.Drawing.Color.White;
             this.labelTareas.Location = new System.Drawing.Point(275, 423);
             this.labelTareas.Name = "labelTareas";
-            this.labelTareas.Size = new System.Drawing.Size(62, 19);
+            this.labelTareas.Size = new System.Drawing.Size(78, 24);
             this.labelTareas.TabIndex = 9;
             this.labelTareas.Text = "Tareas";
             // 
@@ -144,7 +144,7 @@
             this.labelSubTareas.ForeColor = System.Drawing.Color.White;
             this.labelSubTareas.Location = new System.Drawing.Point(275, 617);
             this.labelSubTareas.Name = "labelSubTareas";
-            this.labelSubTareas.Size = new System.Drawing.Size(86, 19);
+            this.labelSubTareas.Size = new System.Drawing.Size(108, 24);
             this.labelSubTareas.TabIndex = 10;
             this.labelSubTareas.Text = "Subtareas";
             // 
@@ -186,8 +186,9 @@
             // 
             // FormProyectos
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1000, 995);
@@ -205,7 +206,7 @@
             this.Controls.Add(this.labelFechaFin);
             this.Controls.Add(this.labelFechaInicio);
             this.Controls.Add(this.labelNombreProyecto);
-            this.Font = new System.Drawing.Font("Merriweather Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormProyectos";
             this.Text = "Proyectos";
