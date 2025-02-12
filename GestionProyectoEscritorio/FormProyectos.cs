@@ -1,148 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using GestionProyectoEscritorio;
+using Newtonsoft.Json;
 
-namespace GestionProyectoEscritorio
+namespace GestorDeProyectos
 {
     public partial class FormProyectos : Form
     {
-        private List<Usuario> listaUsuarios = new List<Usuario>();
-        private List<Proyecto> listaProyectos = new List<Proyecto>();
-        private List<Tareas> tareas = new List<Tareas>(); // Lista de tareas
-        private List<string> subtareas = new List<string>(); // Lista de subtareas
-        private static readonly string ClaveEncriptacion = "0123456789012345";
-        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210");
+        String nomProyecto;
+        String tarea;
+        private List<string> usuariosSeleccionados = new List<string>();
+        private List<Tareas> tareas = new List<Tareas>();
+        private List<string> subtareas = new List<string>();
+
+        private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de 16 caracteres para AES
+        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV invertido (16 bytes)
 
         public FormProyectos()
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
-            CargarUsuariosDesdeJson(); // Cargar usuarios
-            CargarProyectosDesdeJson(); // Cargar proyectos
+            CargarUsuarios();
+            this.FormClosing += FormProyectos_FormClosing;
         }
 
-        private void btnCrearProyecto_Click(object sender, EventArgs e)
+        private void FormProyectos_FormClosing(object sender, FormClosingEventArgs e)
         {
-            string nombreProyecto = textBoxProyecto.Text;
-            DateTime fechaInicio = dateTimePickerFechaInici.Value;
-            DateTime fechaFin = dateTimePickerFechaFin.Value;
-            List<string> usuariosSeleccionados = listBoxUsuarios.SelectedItems.Cast<Usuario>().Select(u => u.Nombre).ToList();
-
-            // Validar si se ha ingresado un nombre de proyecto
-            if (string.IsNullOrEmpty(nombreProyecto))
-            {
-                MessageBox.Show("Por favor, ingrese el nombre del proyecto.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // Validar fechas
-            if (fechaInicio > fechaFin)
-            {
-                MessageBox.Show("La fecha de inicio no puede ser posterior a la fecha de fin.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // Crear el proyecto sin las subtareas
-            Proyecto nuevoProyecto = new Proyecto
-            {
-                NombreProyecto = nombreProyecto,
-                FechaInicio = fechaInicio.ToString("yyyy-MM-dd"),
-                FechaFin = fechaFin.ToString("yyyy-MM-dd"),
-                ListaUsuarios = usuariosSeleccionados,
-                Tareas = tareas.Select(t => t.NombreTarea).ToList(), // Guardar solo los nombres de las tareas
-                SubTareas = subtareas
-            };
-
-            listaProyectos.Add(nuevoProyecto);
-
-            // Guardar el proyecto
-            GuardarProyecto(nuevoProyecto);
-
-            MessageBox.Show("Proyecto creado exitosamente.");
-            this.Hide();
-            Form1 nuevoForm = new Form1();
-            nuevoForm.ShowDialog();
+            Application.Exit();
         }
 
-        private void CargarUsuariosDesdeJson()
+        private void CargarUsuarios()
         {
-            try
-            {
-                string rutaArchivo = "usuarios.json";
+            string rutaArchivo = "usuarios.json"; // Ruta del archivo JSON
 
-                if (File.Exists(rutaArchivo))
+            // Verificar si el archivo existe
+            if (File.Exists(rutaArchivo))
+            {
+                try
                 {
-                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
-                    string json = DesencriptarJson(jsonEncriptado);
-                    listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(json) ?? new List<Usuario>();
+                    // Leer y desencriptar el contenido del archivo
+                    string contenidoEncriptado = File.ReadAllText(rutaArchivo);
+                    string contenidoDesencriptado = DesencriptarJson(contenidoEncriptado);
 
-                    var usuariosDesarrolladores = listaUsuarios.Where(u => u.EsDesarrollador == true).ToList();
+                    // Deserializar los datos a la lista de usuarios
+                    var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(contenidoDesencriptado) ?? new List<Usuario>();
 
-                    listBoxUsuarios.DataSource = usuariosDesarrolladores;
-                    listBoxUsuarios.DisplayMember = "Nombre";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al cargar usuarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+                    // Limpiar el ListBox antes de agregar usuarios
+                    listBoxUsuarios.Items.Clear();
 
-        private string DesencriptarJson(string jsonEncriptado)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                aesAlg.IV = IVPersonalizado;
-
-                byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
-                byte[] iv = new byte[16];
-                Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
-
-                aesAlg.IV = iv;
-
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    // Agregar solo los nombres de los usuarios al ListBox
+                    foreach (var usuario in usuarios)
                     {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            return srDecrypt.ReadToEnd();
-                        }
+                        listBoxUsuarios.Items.Add(usuario.Nombre);
                     }
                 }
-            }
-        }
-
-        private void CargarProyectosDesdeJson()
-        {
-            try
-            {
-                string rutaArchivo = "proyectos.json";
-
-                if (File.Exists(rutaArchivo))
+                catch
                 {
-                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
-                    string json = DesencriptarJson(jsonEncriptado);
-                    var listaProyectosJson = JsonConvert.DeserializeObject<List<object>>(json);
-
-                    if (listaProyectosJson != null && listaProyectosJson.Count > 0)
-                    {
-                        listaProyectos = listaProyectosJson.Select(p => JsonConvert.DeserializeObject<Proyecto>(JsonConvert.SerializeObject(p))).ToList();
-                    }
+                    MessageBox.Show("El archivo de usuarios no se puede desencriptar o está dañado.");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error al cargar proyectos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No hay usuarios registrados.");
             }
         }
 
@@ -202,29 +131,61 @@ namespace GestionProyectoEscritorio
             }
         }
 
-        private void GuardarProyecto(Proyecto proyecto)
+        private void buttonConfirmarSubtareas_Click(object sender, EventArgs e)
         {
-            try
+            if (comboBoxTareas.SelectedItem != null)
             {
-                string rutaArchivo = "proyectos.json";
-                List<Proyecto> proyectos = new List<Proyecto>();
+                string tareaSeleccionada = comboBoxTareas.SelectedItem.ToString();
+                var tareaEncontrada = tareas.FirstOrDefault(t => t.NombreTarea.Equals(tareaSeleccionada, StringComparison.OrdinalIgnoreCase));
 
-                if (File.Exists(rutaArchivo))
+                if (tareaEncontrada != null)
                 {
-                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
-                    string json = DesencriptarJson(jsonEncriptado);
-                    proyectos = JsonConvert.DeserializeObject<List<Proyecto>>(json) ?? new List<Proyecto>();
+                    // Verificar si las subtareas ya están asociadas a la tarea
+                    if (tareaEncontrada.Subtareas == null)
+                    {
+                        tareaEncontrada.Subtareas = new List<string>();
+                    }
+
+                    foreach (var subtarea in subtareas)
+                    {
+                        if (tareaEncontrada.Subtareas.Any(s => s.Equals(subtarea, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            MessageBox.Show($"La subtarea '{subtarea}' ya está asociada a la tarea '{tareaSeleccionada}'.");
+                            subtareas.Clear();
+                            listViewSubtareas.Clear();
+                            return;
+                        }
+                    }
+
+                    tareaEncontrada.Subtareas.AddRange(subtareas);
+                    MessageBox.Show("Subtareas añadidas exitosamente.");
+                    listViewSubtareas.Clear();
+                    subtareas.Clear();
                 }
-
-                proyectos.Add(proyecto);
-
-                string jsonSerializado = JsonConvert.SerializeObject(proyectos, Formatting.Indented);
-                string jsonEncriptadoFinal = EncriptarJson(jsonSerializado);
-                File.WriteAllText(rutaArchivo, jsonEncriptadoFinal);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error al guardar proyecto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Por favor, selecciona una tarea.");
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string nombreProyecto = textBoxProyecto.Text;
+
+            if (string.IsNullOrWhiteSpace(nombreProyecto))
+            {
+                MessageBox.Show("Los campos estan vacios, rellenelos antes de aceptar.", "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                if (crearJson(nombreProyecto))
+                {
+                    MessageBox.Show("Proyecto creado exitosamente.");
+                    this.Hide();
+                    Form1 nuevoForm = new Form1();
+                    nuevoForm.ShowDialog();
+                }
             }
         }
 
@@ -251,6 +212,109 @@ namespace GestionProyectoEscritorio
                     return Convert.ToBase64String(encrypted);
                 }
             }
+        }
+
+        private string DesencriptarJson(string jsonEncriptado)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                aesAlg.IV = IVPersonalizado;
+
+                byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool crearJson(string nombreProyecto)
+        {
+            string rutaArchivo = "proyecto.json";
+
+            List<Proyecto> proyectos;
+
+            // Verificar si el archivo existe y desencriptarlo
+            if (File.Exists(rutaArchivo))
+            {
+                string contenidoEncriptado = File.ReadAllText(rutaArchivo);
+                if (!string.IsNullOrWhiteSpace(contenidoEncriptado))
+                {
+                    try
+                    {
+                        string contenidoDesencriptado = DesencriptarJson(contenidoEncriptado);
+                        proyectos = JsonConvert.DeserializeObject<List<Proyecto>>(contenidoDesencriptado) ?? new List<Proyecto>();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("El archivo JSON está dañado o no se puede desencriptar.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    proyectos = new List<Proyecto>();
+                }
+            }
+            else
+            {
+                proyectos = new List<Proyecto>();
+            }
+
+            // Verificar si el proyecto ya existe
+            if (proyectos.Any(u => u.NombreProyecto == nombreProyecto))
+            {
+                MessageBox.Show("El proyecto ya existe.");
+                return false;
+            }
+
+            // Recopilar datos del nuevo proyecto
+            foreach (var item in listBoxUsuarios.SelectedItems)
+            {
+                usuariosSeleccionados.Add(item.ToString());
+            }
+
+            var nuevoProyecto = new Proyecto
+            {
+                NombreProyecto = textBoxProyecto.Text,
+                Tareas = tareas.Select(t => t.NombreTarea).ToList(),  // Nombres de tareas
+                FechaInicio = dateTimePickerFechaInici.Value,  // Verifica que este sea el nombre correcto
+                FechaFin = dateTimePickerFechaFin.Value,  // Asegúrate de que este sea el nombre correcto
+                Usuarios = usuariosSeleccionados  // Asegúrate de que usuariosSeleccionados sea una lista válida
+            };
+
+
+
+            proyectos.Add(nuevoProyecto);
+
+            // Serializar y encriptar el JSON
+            string jsonSerializado = JsonConvert.SerializeObject(proyectos, Formatting.Indented);
+            string jsonEncriptado = EncriptarJson(jsonSerializado);
+            File.WriteAllText(rutaArchivo, jsonEncriptado);
+
+            return true;
+        }
+
+        private void buttonCancelar_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 nuevoForm = new Form1();
+            nuevoForm.ShowDialog();
+        }
+
+        private void FormProyectos_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

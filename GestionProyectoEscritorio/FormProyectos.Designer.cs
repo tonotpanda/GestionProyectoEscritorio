@@ -1,4 +1,6 @@
-﻿namespace GestionProyectoEscritorio
+﻿using System;
+
+namespace GestorDeProyectos
 {
     partial class FormProyectos
     {
@@ -153,7 +155,6 @@
             this.btnCrearProyecto.TabIndex = 12;
             this.btnCrearProyecto.Text = "Guardar";
             this.btnCrearProyecto.UseVisualStyleBackColor = true;
-            this.btnCrearProyecto.Click += new System.EventHandler(this.btnCrearProyecto_Click);
             // 
             // btnCancelarProyecto
             // 
@@ -179,6 +180,7 @@
             this.buttonAgregarTarea.TabIndex = 17;
             this.buttonAgregarTarea.Text = "Agregar";
             this.buttonAgregarTarea.UseVisualStyleBackColor = true;
+            this.buttonAgregarTarea.Click += new System.EventHandler(this.buttonAgregarTarea_Click);
             // 
             // buttonCancelarTarea
             // 
@@ -278,6 +280,7 @@
             this.buttonConfirmarSubtareas.TabIndex = 27;
             this.buttonConfirmarSubtareas.Text = "Confirmar";
             this.buttonConfirmarSubtareas.UseVisualStyleBackColor = true;
+            this.buttonConfirmarSubtareas.Click += new System.EventHandler(this.buttonConfirmarSubtareas_Click);
             // 
             // buttonAgregarSubtarea
             // 
@@ -287,6 +290,7 @@
             this.buttonAgregarSubtarea.TabIndex = 28;
             this.buttonAgregarSubtarea.Text = "Agregar";
             this.buttonAgregarSubtarea.UseVisualStyleBackColor = true;
+            this.buttonAgregarSubtarea.Click += new System.EventHandler(this.buttonAgregarSubtarea_Click);
             // 
             // FormProyectos
             // 
@@ -328,6 +332,8 @@
             this.PerformLayout();
 
         }
+
+        
 
         #endregion
 
