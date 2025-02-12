@@ -32,6 +32,7 @@ namespace GestorDeProyectos
             this.StartPosition = FormStartPosition.CenterScreen;
             CargarUsuarios();
             this.FormClosing += FormProyectos_FormClosing;
+            comboBoxTareas.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void FormProyectos_FormClosing(object sender, FormClosingEventArgs e)
