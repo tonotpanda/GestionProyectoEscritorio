@@ -17,8 +17,9 @@ namespace GestorDeProyectos
 {
     public partial class FormProyectos : Form
     {
-        String nomProyecto;
-        String tarea;
+        private List<Usuario> listaUsuarios = new List<Usuario>();
+        private List<Proyecto> listaProyectos = new List<Proyecto>();
+
         private List<string> usuariosSeleccionados = new List<string>();
         private List<Tareas> tareas = new List<Tareas>();
         private List<string> subtareas = new List<string>();
@@ -30,7 +31,7 @@ namespace GestorDeProyectos
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
-            CargarUsuarios();
+            CargarUsuariosDesarrolladores();
             this.FormClosing += FormProyectos_FormClosing;
             comboBoxTareas.DropDownStyle = ComboBoxStyle.DropDownList;
         }
@@ -40,41 +41,86 @@ namespace GestorDeProyectos
             Application.Exit();
         }
 
-        private void CargarUsuarios()
+        private void CargarUsuariosDesarrolladores()
         {
-            string rutaArchivo = "usuarios.json"; // Ruta del archivo JSON
-
-            // Verificar si el archivo existe
-            if (File.Exists(rutaArchivo))
+            try
             {
-                try
+                // Ruta donde se guardan los usuarios
+                string rutaArchivo = "usuarios.json";
+
+                if (File.Exists(rutaArchivo))
                 {
-                    // Leer y desencriptar el contenido del archivo
-                    string contenidoEncriptado = File.ReadAllText(rutaArchivo);
-                    string contenidoDesencriptado = DesencriptarJson(contenidoEncriptado);
+                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
+                    string jsonDesencriptado = DesencriptarJson(jsonEncriptado);
 
-                    // Deserializar los datos a la lista de usuarios
-                    var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(contenidoDesencriptado) ?? new List<Usuario>();
+                    // Deserializar el JSON
+                    listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonDesencriptado) ?? new List<Usuario>();
 
-                    // Limpiar el ListBox antes de agregar usuarios
+                    // Limpiar el ListBox
                     listBoxUsuarios.Items.Clear();
 
-                    // Agregar solo los nombres de los usuarios al ListBox
-                    foreach (var usuario in usuarios)
+                    // Añadir solo los usuarios que son desarrolladores al ListBox
+                    foreach (var usuario in listaUsuarios.Where(u => u.EsDesarrollador))
                     {
-                        listBoxUsuarios.Items.Add(usuario.Nombre);
+                        listBoxUsuarios.Items.Add(usuario.Nombre); // Añadir al ListBox solo usuarios desarrolladores
                     }
                 }
-                catch
-                {
-                    MessageBox.Show("El archivo de usuarios no se puede desencriptar o está dañado.");
-                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("No hay usuarios registrados.");
+                MessageBox.Show($"Error al cargar usuarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // Método para desencriptar el JSON
+        private string DesencriptarJson(string jsonEncriptado)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                aesAlg.IV = IVPersonalizado; // Utiliza el IV personalizado
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(jsonEncriptado)))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Método para encriptar el JSON
+        private string EncriptarJson(string json)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = IVPersonalizado; // IV personalizado
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
+                        }
+                    }
+                    // Retornar el JSON encriptado en formato Base64
+                    return Convert.ToBase64String(msEncrypt.ToArray());
+                }
+            }
+        }
+
+
 
         private void buttonAgregarTarea_Click(object sender, EventArgs e)
         {
@@ -170,6 +216,7 @@ namespace GestorDeProyectos
             }
         }
 
+
         private void button1_Click(object sender, EventArgs e)
         {
             string nombreProyecto = textBoxProyecto.Text;
@@ -190,59 +237,9 @@ namespace GestorDeProyectos
             }
         }
 
-        private string EncriptarJson(string json)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                aesAlg.IV = IVPersonalizado;
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(json);
-                        }
-                    }
-
-                    byte[] encrypted = msEncrypt.ToArray();
-                    return Convert.ToBase64String(encrypted);
-                }
-            }
-        }
-
-        private string DesencriptarJson(string jsonEncriptado)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                aesAlg.IV = IVPersonalizado;
-
-                byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
-
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            return srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-            }
-        }
-
         private bool crearJson(string nombreProyecto)
         {
             string rutaArchivo = "proyecto.json";
-
             List<Proyecto> proyectos;
 
             // Verificar si el archivo existe y desencriptarlo
@@ -285,16 +282,25 @@ namespace GestorDeProyectos
                 usuariosSeleccionados.Add(item.ToString());
             }
 
+            // Crear nuevo proyecto
             var nuevoProyecto = new Proyecto
             {
-                NombreProyecto = textBoxProyecto.Text,
-                Tareas = tareas.Select(t => t.NombreTarea).ToList(),  // Nombres de tareas
-                FechaInicio = dateTimePickerFechaInici.Value,  // Verifica que este sea el nombre correcto
-                FechaFin = dateTimePickerFechaFin.Value,  // Asegúrate de que este sea el nombre correcto
-                Usuarios = usuariosSeleccionados  // Asegúrate de que usuariosSeleccionados sea una lista válida
+                NombreProyecto = nombreProyecto,
+                Tareas = new List<Tareas>(), // Inicializa la lista de tareas
+                FechaInicio = dateTimePickerFechaInici.Value,
+                FechaFin = dateTimePickerFechaFin.Value,
+                Usuarios = usuariosSeleccionados
             };
 
-
+            // Agregar tareas a nuevoProyecto
+            foreach (var tarea in tareas)
+            {
+                nuevoProyecto.Tareas.Add(new Tareas
+                {
+                    NombreTarea = tarea.NombreTarea,
+                    Subtareas = tarea.Subtareas != null ? new List<string>(tarea.Subtareas) : new List<string>()
+                });
+            }
 
             proyectos.Add(nuevoProyecto);
 
@@ -306,16 +312,43 @@ namespace GestorDeProyectos
             return true;
         }
 
-        private void buttonCancelar_Click(object sender, EventArgs e)
+
+
+
+
+
+        private void btnCrearProyecto_Click(object sender, EventArgs e)
+        {
+            string nombreProyecto = textBoxProyecto.Text; // Obtiene el nombre del proyecto desde el TextBox
+
+            // Verificar si el campo de texto está vacío
+            if (string.IsNullOrWhiteSpace(nombreProyecto))
+            {
+                MessageBox.Show("Los campos están vacíos, por favor rellénelos antes de aceptar.", "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Llamar a la función para crear el JSON del proyecto
+            if (crearJson(nombreProyecto))
+            {
+                MessageBox.Show("Proyecto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Ocultar el formulario actual y abrir el siguiente formulario
+                this.Hide();
+                Form1 nuevoForm = new Form1(); // Asumiendo que Form1 es el siguiente formulario
+                nuevoForm.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Hubo un error al guardar el proyecto. Intenta nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnCancelarProyecto_Click(object sender, EventArgs e)
         {
             this.Hide();
             Form1 nuevoForm = new Form1();
             nuevoForm.ShowDialog();
-        }
-
-        private void FormProyectos_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

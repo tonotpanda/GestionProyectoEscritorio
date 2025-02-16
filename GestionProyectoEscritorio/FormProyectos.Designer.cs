@@ -155,6 +155,7 @@ namespace GestorDeProyectos
             this.btnCrearProyecto.TabIndex = 12;
             this.btnCrearProyecto.Text = "Guardar";
             this.btnCrearProyecto.UseVisualStyleBackColor = true;
+            this.btnCrearProyecto.Click += new System.EventHandler(this.btnCrearProyecto_Click);
             // 
             // btnCancelarProyecto
             // 
@@ -164,6 +165,7 @@ namespace GestorDeProyectos
             this.btnCancelarProyecto.TabIndex = 15;
             this.btnCancelarProyecto.Text = "Cancelar";
             this.btnCancelarProyecto.UseVisualStyleBackColor = true;
+            this.btnCancelarProyecto.Click += new System.EventHandler(this.btnCancelarProyecto_Click);
             // 
             // textBoxTarea
             // 
@@ -333,7 +335,7 @@ namespace GestorDeProyectos
 
         }
 
-        
+
 
         #endregion
 

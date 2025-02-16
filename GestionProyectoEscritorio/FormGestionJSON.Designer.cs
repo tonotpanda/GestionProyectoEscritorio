@@ -68,7 +68,7 @@ namespace GestionProyectoEscritorio
             this.btnBorrar.TabIndex = 2;
             this.btnBorrar.Text = "Borrar";
             this.btnBorrar.UseVisualStyleBackColor = true;
-            this.btnBorrar.Click += new System.EventHandler(this.btnBorrar_Click);
+           
             // 
             // btnGuardar
             // 
@@ -78,7 +78,7 @@ namespace GestionProyectoEscritorio
             this.btnGuardar.TabIndex = 3;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
-            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
+            
             // 
             // btnCancelarJSON
             // 
@@ -88,7 +88,7 @@ namespace GestionProyectoEscritorio
             this.btnCancelarJSON.TabIndex = 4;
             this.btnCancelarJSON.Text = "Cancelar";
             this.btnCancelarJSON.UseVisualStyleBackColor = true;
-            this.btnCancelarJSON.Click += new System.EventHandler(this.btnCancelarJSON_Click);
+          
             // 
             // FormGestionJSON
             // 
@@ -107,6 +107,7 @@ namespace GestionProyectoEscritorio
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "FormGestionJSON";
             this.Text = "JSON";
+            
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewJSON)).EndInit();
             this.ResumeLayout(false);
 

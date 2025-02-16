@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace GestionProyectoEscritorio
+public class Tareas
 {
-    internal class Tareas
-    {
-        public string NombreTarea;
-        public List<string> Subtareas { get; set; }
+    public string NombreTarea { get; set; }
+    public List<string> Subtareas { get; set; }
 
-        public Tareas() { }
-        public Tareas(string nombreTarea, List<string> subtareas)
-        {
-            NombreTarea = nombreTarea;
-            Subtareas = subtareas;
-        }
+    public Tareas() { }
+
+    public Tareas(string nombreTarea, List<string> subtareas)
+    {
+        NombreTarea = nombreTarea;
+        Subtareas = subtareas ?? new List<string>(); // Si Subtareas es null, inicializa como lista vacía
     }
 }

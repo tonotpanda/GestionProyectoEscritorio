@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 
-namespace GestionProyectoEscritorio
+public class Proyecto
 {
-    public class Proyecto
-    {
-        public string NombreProyecto { get; set; }
-        public List<string> Tareas { get; set; }
-        public DateTime FechaInicio { get; set; }  // Asegúrate de que esta propiedad sea de tipo DateTime
-        public DateTime FechaFin { get; set; }  // Asegúrate de que esta propiedad sea de tipo DateTime
-        public List<string> Usuarios { get; set; }
-    }
+    public string NombreProyecto { get; set; }
+    public List<Tareas> Tareas { get; set; }
+    public DateTime FechaInicio { get; set; }
+    public DateTime FechaFin { get; set; }
+    public List<string> Usuarios { get; set; }
 
+    public Proyecto() { }
 }
