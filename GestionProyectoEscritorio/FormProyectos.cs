@@ -92,7 +92,6 @@ namespace GestorDeProyectos
             }
         }
 
-
         // Método para desencriptar el JSON
         private string DesencriptarJson(string jsonEncriptado)
         {
@@ -140,8 +139,6 @@ namespace GestorDeProyectos
                 }
             }
         }
-
-
 
         private void buttonAgregarTarea_Click(object sender, EventArgs e)
         {
@@ -237,24 +234,30 @@ namespace GestorDeProyectos
             }
         }
 
-
-        private void button1_Click(object sender, EventArgs e)
+        private void btnCrearProyecto_Click(object sender, EventArgs e)
         {
-            string nombreProyecto = textBoxProyecto.Text;
+            string nombreProyecto = textBoxProyecto.Text; // Obtiene el nombre del proyecto desde el TextBox
 
+            // Verificar si el campo de texto está vacío
             if (string.IsNullOrWhiteSpace(nombreProyecto))
             {
-                MessageBox.Show("Los campos estan vacios, rellenelos antes de aceptar.", "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Los campos están vacíos, por favor rellénelos antes de aceptar.", "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Llamar a la función para crear el JSON del proyecto
+            if (crearJson(nombreProyecto))
+            {
+                MessageBox.Show("Proyecto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Ocultar el formulario actual y abrir el siguiente formulario
+                this.Hide();
+                Form1 nuevoForm = new Form1(); // Asumiendo que Form1 es el siguiente formulario
+                nuevoForm.ShowDialog();
             }
             else
             {
-                if (crearJson(nombreProyecto))
-                {
-                    MessageBox.Show("Proyecto creado exitosamente.");
-                    this.Hide();
-                    Form1 nuevoForm = new Form1();
-                    nuevoForm.ShowDialog();
-                }
+                MessageBox.Show("Hubo un error al guardar el proyecto. Intenta nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -331,38 +334,6 @@ namespace GestorDeProyectos
             File.WriteAllText(rutaArchivo, jsonEncriptado);
 
             return true;
-        }
-
-
-
-
-
-
-        private void btnCrearProyecto_Click(object sender, EventArgs e)
-        {
-            string nombreProyecto = textBoxProyecto.Text; // Obtiene el nombre del proyecto desde el TextBox
-
-            // Verificar si el campo de texto está vacío
-            if (string.IsNullOrWhiteSpace(nombreProyecto))
-            {
-                MessageBox.Show("Los campos están vacíos, por favor rellénelos antes de aceptar.", "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Llamar a la función para crear el JSON del proyecto
-            if (crearJson(nombreProyecto))
-            {
-                MessageBox.Show("Proyecto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Ocultar el formulario actual y abrir el siguiente formulario
-                this.Hide();
-                Form1 nuevoForm = new Form1(); // Asumiendo que Form1 es el siguiente formulario
-                nuevoForm.ShowDialog();
-            }
-            else
-            {
-                MessageBox.Show("Hubo un error al guardar el proyecto. Intenta nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void btnCancelarProyecto_Click(object sender, EventArgs e)
