@@ -31,7 +31,7 @@ namespace GestorDeProyectos
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
-            CargarUsuariosDesarrolladores();
+            CargarUsuarios();
             this.FormClosing += FormProyectos_FormClosing;
             comboBoxTareas.DropDownStyle = ComboBoxStyle.DropDownList;
         }
@@ -41,74 +41,70 @@ namespace GestorDeProyectos
             Application.Exit();
         }
 
-        private void CargarUsuariosDesarrolladores()
+        // Método para cargar usuarios desde el archivo JSON (desencriptando el archivo)
+        private void CargarUsuarios()
         {
-            try
+            string rutaArchivo = "usuarios.json"; // Ruta del archivo JSON
+
+            // Verificar si el archivo existe
+            if (File.Exists(rutaArchivo))
             {
-                // Ruta donde se guardan los usuarios
-                string rutaArchivo = "usuarios.json";
-
-                if (File.Exists(rutaArchivo))
+                try
                 {
-                    string jsonEncriptado = File.ReadAllText(rutaArchivo);
+                    // Leer y desencriptar el contenido del archivo
+                    string contenidoEncriptado = File.ReadAllText(rutaArchivo);
+                    string contenidoDesencriptado = DesencriptarJson(contenidoEncriptado);
 
-                    // Desencriptar el contenido del archivo
-                    string jsonDesencriptado = DesencriptarJson(jsonEncriptado);
+                    // Deserializar los datos a la lista de usuarios
+                    var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(contenidoDesencriptado) ?? new List<Usuario>();
 
-                    // Verificar si el JSON desencriptado es nulo o vacío
-                    if (string.IsNullOrEmpty(jsonDesencriptado))
-                    {
-                        MessageBox.Show("El archivo de usuarios está vacío o no se pudo desencriptar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Deserializar el JSON
-                    listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonDesencriptado) ?? new List<Usuario>();
-
-                    // Limpiar el ListBox
+                    // Limpiar el ListBox antes de agregar usuarios
                     listBoxUsuarios.Items.Clear();
 
-                    // Verificar si la lista de usuarios está vacía
-                    if (listaUsuarios.Count == 0)
+                    // Filtrar y agregar solo los usuarios que son desarrolladores (EsDesarrollador == true)
+                    foreach (var usuario in usuarios.Where(u => u.EsDesarrollador == true))
                     {
-                        MessageBox.Show("No se encontraron usuarios en el archivo.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    // Añadir solo los usuarios que son desarrolladores al ListBox
-                    foreach (var usuario in listaUsuarios.Where(u => u.EsDesarrollador))
-                    {
-                        listBoxUsuarios.Items.Add(usuario.Nombre); // Añadir al ListBox solo usuarios desarrolladores
+                        listBoxUsuarios.Items.Add(usuario.Nombre);
                     }
                 }
-                else
+                catch
                 {
-                    MessageBox.Show("El archivo de usuarios no existe.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("El archivo de usuarios no se puede desencriptar o está dañado.");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error al cargar usuarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No hay usuarios registrados.");
             }
         }
+
+
 
         // Método para desencriptar el JSON
         private string DesencriptarJson(string jsonEncriptado)
         {
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                aesAlg.IV = IVPersonalizado; // Utiliza el IV personalizado
+                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
+                aesAlg.IV = IVPersonalizado; // Usar el IV personalizado invertido
+
+                byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
+
+                // Extraemos el IV de los primeros 16 bytes (aunque en este caso, estamos usando un IV fijo)
+                byte[] iv = new byte[16];
+                Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
+
+                aesAlg.IV = iv;
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(jsonEncriptado)))
+                using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
-                            return srDecrypt.ReadToEnd();
+                            return srDecrypt.ReadToEnd(); // Retornar el JSON desencriptado
                         }
                     }
                 }
@@ -121,21 +117,24 @@ namespace GestorDeProyectos
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion); // Clave de 16 bytes
-                aesAlg.IV = IVPersonalizado; // IV personalizado
+                aesAlg.IV = IVPersonalizado; // Usar el IV personalizado invertido
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
+                    // Guardamos primero el IV antes de los datos encriptados
+                    msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
+
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
-                            swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
+                            swEncrypt.Write(json); // Escribir el JSON en el flujo cifrado
                         }
                     }
-                    // Retornar el JSON encriptado en formato Base64
-                    return Convert.ToBase64String(msEncrypt.ToArray());
+
+                    return Convert.ToBase64String(msEncrypt.ToArray()); // Retornar el JSON encriptado como Base64
                 }
             }
         }
