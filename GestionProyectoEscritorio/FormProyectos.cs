@@ -51,7 +51,16 @@ namespace GestorDeProyectos
                 if (File.Exists(rutaArchivo))
                 {
                     string jsonEncriptado = File.ReadAllText(rutaArchivo);
+
+                    // Desencriptar el contenido del archivo
                     string jsonDesencriptado = DesencriptarJson(jsonEncriptado);
+
+                    // Verificar si el JSON desencriptado es nulo o vacío
+                    if (string.IsNullOrEmpty(jsonDesencriptado))
+                    {
+                        MessageBox.Show("El archivo de usuarios está vacío o no se pudo desencriptar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
                     // Deserializar el JSON
                     listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonDesencriptado) ?? new List<Usuario>();
@@ -59,11 +68,22 @@ namespace GestorDeProyectos
                     // Limpiar el ListBox
                     listBoxUsuarios.Items.Clear();
 
+                    // Verificar si la lista de usuarios está vacía
+                    if (listaUsuarios.Count == 0)
+                    {
+                        MessageBox.Show("No se encontraron usuarios en el archivo.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
                     // Añadir solo los usuarios que son desarrolladores al ListBox
                     foreach (var usuario in listaUsuarios.Where(u => u.EsDesarrollador))
                     {
                         listBoxUsuarios.Items.Add(usuario.Nombre); // Añadir al ListBox solo usuarios desarrolladores
                     }
+                }
+                else
+                {
+                    MessageBox.Show("El archivo de usuarios no existe.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
@@ -71,6 +91,7 @@ namespace GestorDeProyectos
                 MessageBox.Show($"Error al cargar usuarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         // Método para desencriptar el JSON
         private string DesencriptarJson(string jsonEncriptado)
