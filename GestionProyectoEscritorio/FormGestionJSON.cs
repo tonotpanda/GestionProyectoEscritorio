@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GestionProyectoEscritorio
 {
@@ -42,11 +43,8 @@ namespace GestionProyectoEscritorio
                     // Desencriptar el JSON completo
                     string json = DesencriptarJson(jsonEncriptado);
 
-                    // Deserializar el JSON en una lista de proyectos
-                    var proyectosJson = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json) ?? new List<Dictionary<string, object>>();
-
                     // Cargar los datos en el DataGridView
-                    CargarDatosEnDataGridView(proyectosJson);
+                    CargarDatosEnDataGridView(json);
                 }
                 catch (Exception ex)
                 {
@@ -93,47 +91,74 @@ namespace GestionProyectoEscritorio
         }
 
         // Método para cargar los datos en el DataGridView
-        private void CargarDatosEnDataGridView(List<Dictionary<string, object>> proyectosJson)
+        private void CargarDatosEnDataGridView(string json)
         {
             dataGridViewJSON.Rows.Clear();
             dataGridViewJSON.Columns.Clear();
 
-            if (proyectosJson == null || proyectosJson.Count == 0)
+            try
             {
-                MessageBox.Show("No se encontraron proyectos en el archivo JSON.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+                // Deserializar el JSON a un objeto dinámico (JArray o JObject)
+                var jsonData = JsonConvert.DeserializeObject<dynamic>(json);
 
-            // Crear columnas dinámicas basadas en las claves del primer proyecto
-            var primerasClaves = proyectosJson.FirstOrDefault();
-            if (primerasClaves != null)
-            {
-                // Añadir las columnas dinámicamente
-                foreach (var clave in primerasClaves.Keys)
+                if (jsonData == null)
                 {
-                    dataGridViewJSON.Columns.Add(clave, clave); // Usamos las claves del JSON como nombres de las columnas
+                    MessageBox.Show("El archivo JSON está vacío o no es válido.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
 
-                // Llenar las filas con los datos de cada proyecto
-                foreach (var proyecto in proyectosJson)
+                // Si el JSON es un array (JArray)
+                if (jsonData is JArray)
                 {
-                    // Si existe una clave de "Contrasena", la desencriptamos
-                    if (proyecto.ContainsKey("Contrasena"))
+                    // Crear columnas dinámicas basadas en las propiedades del primer objeto
+                    var firstItem = jsonData[0];
+                    if (firstItem != null)
                     {
-                        string contrasenaEncriptada = proyecto["Contrasena"].ToString();
-                        string contrasenaDesencriptada = DesencriptarContrasena(contrasenaEncriptada);
-                        proyecto["Contrasena"] = contrasenaDesencriptada; // Actualizamos la contraseña desencriptada
+                        foreach (JProperty property in firstItem)
+                        {
+                            dataGridViewJSON.Columns.Add(property.Name, property.Name);
+                        }
+
+                        // Llenar las filas con los datos del JSON
+                        foreach (var item in jsonData)
+                        {
+                            var row = new List<string>();
+                            foreach (JProperty property in item)
+                            {
+                                row.Add(property.Value.ToString());
+                            }
+                            dataGridViewJSON.Rows.Add(row.ToArray());
+                        }
+                    }
+                }
+                // Si el JSON es un objeto (JObject)
+                else if (jsonData is JObject)
+                {
+                    // Crear columnas dinámicas basadas en las propiedades del objeto
+                    foreach (JProperty property in jsonData)
+                    {
+                        dataGridViewJSON.Columns.Add(property.Name, property.Name);
                     }
 
-                    // Convertir los valores de cada proyecto a cadenas
-                    var valores = proyecto.Values.Select(v => v.ToString()).ToArray();
-
-                    // Añadir la fila al DataGridView
-                    dataGridViewJSON.Rows.Add(valores);
+                    // Llenar una fila con los datos del JSON
+                    var row = new List<string>();
+                    foreach (JProperty property in jsonData)
+                    {
+                        row.Add(property.Value.ToString());
+                    }
+                    dataGridViewJSON.Rows.Add(row.ToArray());
+                }
+                else
+                {
+                    MessageBox.Show("El archivo JSON no tiene una estructura válida.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
                 dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
