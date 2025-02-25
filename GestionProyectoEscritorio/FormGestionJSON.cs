@@ -1,208 +1,238 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Windows.Forms;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
-namespace GestionProyectoEscritorio
-{
-    public partial class FormGestionJSON : Form
+    namespace GestionProyectoEscritorio
     {
-        private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de encriptación AES
-        private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV de 16 bytes
-
-        private List<Proyecto> listaProyectos = new List<Proyecto>(); // Lista de proyectos
-        private string rutaArchivoActual = string.Empty; // Variable para almacenar la ruta del archivo cargado
-
-        public FormGestionJSON()
+        public partial class FormGestionJSON : Form
         {
-            InitializeComponent();
-            this.StartPosition = FormStartPosition.CenterScreen;
-        }
+            private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de encriptación AES
+            private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV de 16 bytes
+            private string rutaArchivoActual = string.Empty; // Variable para almacenar la ruta del archivo cargado
 
-        // Cargar los proyectos desde el archivo JSON
-        private void btnSeleccionarJSON_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            public FormGestionJSON()
             {
-                Filter = "Archivos JSON|*.json",
-                Title = "Seleccionar archivo JSON"
-            };
+                InitializeComponent();
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            // Cargar los proyectos desde el archivo JSON
+            private void btnSeleccionarJSON_Click(object sender, EventArgs e)
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Filter = "Archivos JSON|*.json",
+                    Title = "Seleccionar archivo JSON"
+                };
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        rutaArchivoActual = openFileDialog.FileName; // Guardamos la ruta del archivo seleccionado
+                        string jsonEncriptado = File.ReadAllText(rutaArchivoActual); // Leemos el archivo encriptado
+
+                        // Desencriptar el JSON completo
+                        string json = DesencriptarJson(jsonEncriptado);
+
+                        // Cargar los datos en el DataGridView
+                        CargarDatosEnDataGridView(json);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al cargar el archivo JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+
+            // Método para desencriptar el JSON completo
+            private string DesencriptarJson(string jsonEncriptado)
             {
                 try
                 {
-                    rutaArchivoActual = openFileDialog.FileName; // Guardamos la ruta del archivo seleccionado
-                    string jsonEncriptado = File.ReadAllText(rutaArchivoActual); // Leemos el archivo encriptado
-
-                    // Desencriptar el JSON completo
-                    string json = DesencriptarJson(jsonEncriptado);
-
-                    // Cargar los datos en el DataGridView
-                    CargarDatosEnDataGridView(json);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al cargar el archivo JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        // Método para desencriptar el JSON completo
-        private string DesencriptarJson(string jsonEncriptado)
-        {
-            try
-            {
-                using (Aes aesAlg = Aes.Create())
-                {
-                    aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                    aesAlg.IV = IVPersonalizado;
-
-                    byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
-                    byte[] iv = new byte[16];
-                    Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
-
-                    aesAlg.IV = iv;
-
-                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                    using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
+                    using (Aes aesAlg = Aes.Create())
                     {
-                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                        aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                        aesAlg.IV = IVPersonalizado;
+
+                        byte[] datosEncriptados = Convert.FromBase64String(jsonEncriptado);
+                        byte[] iv = new byte[16];
+                        Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
+
+                        aesAlg.IV = iv;
+
+                        ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                        using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
                         {
-                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                            using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                             {
-                                return srDecrypt.ReadToEnd();
+                                using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                                {
+                                    return srDecrypt.ReadToEnd();
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al desencriptar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return string.Empty;
-            }
-        }
-
-        // Método para cargar los datos en el DataGridView
-        private void CargarDatosEnDataGridView(string json)
-        {
-            dataGridViewJSON.Rows.Clear();
-            dataGridViewJSON.Columns.Clear();
-
-            try
-            {
-                // Deserializar el JSON a un objeto dinámico (JArray o JObject)
-                var jsonData = JsonConvert.DeserializeObject<dynamic>(json);
-
-                if (jsonData == null)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("El archivo JSON está vacío o no es válido.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
+                    MessageBox.Show($"Error al desencriptar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return string.Empty;
                 }
+            }
 
-                // Si el JSON es un array (JArray)
-                if (jsonData is JArray)
+            // Método para cargar los datos en el DataGridView
+            private void CargarDatosEnDataGridView(string json)
+            {
+                dataGridViewJSON.Rows.Clear();
+                dataGridViewJSON.Columns.Clear();
+
+                try
                 {
-                    // Crear columnas dinámicas basadas en las propiedades del primer objeto
-                    var firstItem = jsonData[0];
-                    if (firstItem != null)
+                    // Deserializar el JSON a un objeto dinámico (JArray o JObject)
+                    var jsonData = JsonConvert.DeserializeObject<dynamic>(json);
+
+                    if (jsonData == null)
                     {
-                        foreach (JProperty property in firstItem)
+                        MessageBox.Show("El archivo JSON está vacío o no es válido.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    // Si el JSON es un array (JArray)
+                    if (jsonData is JArray)
+                    {
+                        // Crear columnas dinámicas basadas en las propiedades del primer objeto
+                        var firstItem = jsonData[0];
+                        if (firstItem != null)
+                        {
+                            foreach (JProperty property in firstItem)
+                            {
+                                dataGridViewJSON.Columns.Add(property.Name, property.Name);
+                            }
+
+                            // Llenar las filas con los datos del JSON
+                            foreach (var item in jsonData)
+                            {
+                                var row = new List<string>();
+                                foreach (JProperty property in item)
+                                {
+                                    row.Add(property.Value.ToString());
+                                }
+                                dataGridViewJSON.Rows.Add(row.ToArray());
+                            }
+                        }
+                    }
+                    // Si el JSON es un objeto (JObject)
+                    else if (jsonData is JObject)
+                    {
+                        // Crear columnas dinámicas basadas en las propiedades del objeto
+                        foreach (JProperty property in jsonData)
                         {
                             dataGridViewJSON.Columns.Add(property.Name, property.Name);
                         }
 
-                        // Llenar las filas con los datos del JSON
-                        foreach (var item in jsonData)
+                        // Llenar una fila con los datos del JSON
+                        var row = new List<string>();
+                        foreach (JProperty property in jsonData)
                         {
-                            var row = new List<string>();
-                            foreach (JProperty property in item)
-                            {
-                                row.Add(property.Value.ToString());
-                            }
-                            dataGridViewJSON.Rows.Add(row.ToArray());
+                            row.Add(property.Value.ToString());
                         }
+                        dataGridViewJSON.Rows.Add(row.ToArray());
                     }
-                }
-                // Si el JSON es un objeto (JObject)
-                else if (jsonData is JObject)
-                {
-                    // Crear columnas dinámicas basadas en las propiedades del objeto
-                    foreach (JProperty property in jsonData)
+                    else
                     {
-                        dataGridViewJSON.Columns.Add(property.Name, property.Name);
+                        MessageBox.Show("El archivo JSON no tiene una estructura válida.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
-                    // Llenar una fila con los datos del JSON
-                    var row = new List<string>();
-                    foreach (JProperty property in jsonData)
-                    {
-                        row.Add(property.Value.ToString());
-                    }
-                    dataGridViewJSON.Rows.Add(row.ToArray());
+                    // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
+                    dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show("El archivo JSON no tiene una estructura válida.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error al cargar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
-                dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al cargar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
-        // Método para desencriptar la contraseña
-        private string DesencriptarContrasena(string contrasenaEncriptada)
-        {
-            try
+            // Método para desencriptar la contraseña
+            private string DesencriptarContrasena(string contrasenaEncriptada)
             {
-                using (Aes aesAlg = Aes.Create())
+                try
                 {
-                    aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                    aesAlg.IV = IVPersonalizado;
-
-                    byte[] datosEncriptados = Convert.FromBase64String(contrasenaEncriptada);
-                    byte[] iv = new byte[16];
-                    Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
-
-                    aesAlg.IV = iv;
-
-                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                    using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
+                    using (Aes aesAlg = Aes.Create())
                     {
-                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                        aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                        aesAlg.IV = IVPersonalizado;
+
+                        byte[] datosEncriptados = Convert.FromBase64String(contrasenaEncriptada);
+                        byte[] iv = new byte[16];
+                        Array.Copy(datosEncriptados, 0, iv, 0, iv.Length);
+
+                        aesAlg.IV = iv;
+
+                        ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                        using (MemoryStream msDecrypt = new MemoryStream(datosEncriptados, 16, datosEncriptados.Length - 16))
                         {
-                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                            using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                             {
-                                return srDecrypt.ReadToEnd(); // Devolver la contraseña desencriptada
+                                using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                                {
+                                    return srDecrypt.ReadToEnd(); // Devolver la contraseña desencriptada
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al desencriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return string.Empty;
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al desencriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return string.Empty;
-            }
-        }
 
-        // Método para encriptar la contraseña
-        private string EncriptarContrasena(string contrasena)
-        {
-            try
+            // Método para encriptar la contraseña
+            private string EncriptarContrasena(string contrasena)
+            {
+                try
+                {
+                    using (Aes aesAlg = Aes.Create())
+                    {
+                        aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
+                        aesAlg.IV = IVPersonalizado;
+
+                        ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                        using (MemoryStream msEncrypt = new MemoryStream())
+                        {
+                            msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length); // Escribir el IV primero
+
+                            using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                            {
+                                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                                {
+                                    swEncrypt.Write(contrasena); // Escribir la contraseña en el CryptoStream
+                                }
+                            }
+                            return Convert.ToBase64String(msEncrypt.ToArray()); // Retorna la contraseña encriptada en Base64
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al encriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return string.Empty;
+                }
+            }
+
+            // Método para encriptar JSON
+            private string EncriptarJson(string json)
             {
                 using (Aes aesAlg = Aes.Create())
                 {
@@ -219,126 +249,94 @@ namespace GestionProyectoEscritorio
                         {
                             using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                             {
-                                swEncrypt.Write(contrasena); // Escribir la contraseña en el CryptoStream
+                                swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
                             }
                         }
-                        return Convert.ToBase64String(msEncrypt.ToArray()); // Retorna la contraseña encriptada en Base64
+                        return Convert.ToBase64String(msEncrypt.ToArray());
                     }
                 }
             }
-            catch (Exception ex)
+
+            // Método para guardar proyectos en JSON (encriptado)
+            private void GuardarProyectosEnJson()
             {
-                MessageBox.Show($"Error al encriptar la contraseña: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return string.Empty;
-            }
-        }
-
-        // Método para encriptar JSON
-        private string EncriptarJson(string json)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(ClaveEncriptacion);
-                aesAlg.IV = IVPersonalizado;
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msEncrypt = new MemoryStream())
+                try
                 {
-                    msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length); // Escribir el IV primero
+                    // Convertir los datos del DataGridView de nuevo a un JSON
+                    List<Dictionary<string, object>> proyectosJson = new List<Dictionary<string, object>>();
 
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    foreach (DataGridViewRow row in dataGridViewJSON.Rows)
                     {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        if (row.IsNewRow) continue; // Evitar agregar la nueva fila que es solo de entrada
+
+                        Dictionary<string, object> proyecto = new Dictionary<string, object>();
+                        foreach (DataGridViewColumn column in dataGridViewJSON.Columns)
                         {
-                            swEncrypt.Write(json); // Escribir el JSON en el CryptoStream
+                            // Asegurarse de capturar correctamente los valores de cada celda
+                            proyecto[column.Name] = row.Cells[column.Name].Value?.ToString() ?? string.Empty;
                         }
+
+                        // Si existe una clave de "Contrasena", la encriptamos antes de guardar
+                        if (proyecto.ContainsKey("Contrasena"))
+                        {
+                            string contrasena = proyecto["Contrasena"].ToString();
+                            proyecto["Contrasena"] = EncriptarContrasena(contrasena); // Encriptar la contraseña
+                        }
+
+                        proyectosJson.Add(proyecto);
                     }
-                    return Convert.ToBase64String(msEncrypt.ToArray());
-                }
-            }
-        }
 
-        // Método para guardar proyectos en JSON (encriptado)
-        private void GuardarProyectosEnJson()
-        {
-            try
-            {
-                // Convertir los datos del DataGridView de nuevo a un JSON
-                List<Dictionary<string, object>> proyectosJson = new List<Dictionary<string, object>>();
+                    // Serializar el JSON en texto
+                    string json = JsonConvert.SerializeObject(proyectosJson, Formatting.Indented);
 
-                foreach (DataGridViewRow row in dataGridViewJSON.Rows)
-                {
-                    if (row.IsNewRow) continue; // Evitar agregar la nueva fila que es solo de entrada
+                    // Encriptar el JSON
+                    string jsonEncriptado = EncriptarJson(json);
 
-                    Dictionary<string, object> proyecto = new Dictionary<string, object>();
-                    foreach (DataGridViewColumn column in dataGridViewJSON.Columns)
+                    // Guardar el archivo JSON encriptado en el archivo original
+                    if (!string.IsNullOrEmpty(rutaArchivoActual)) // Asegurarse de que la ruta esté definida
                     {
-                        // Asegurarse de capturar correctamente los valores de cada celda
-                        proyecto[column.Name] = row.Cells[column.Name].Value?.ToString() ?? string.Empty;
-                    }
+                        File.WriteAllText(rutaArchivoActual, jsonEncriptado); // Sobrescribir el archivo original con los datos encriptados
 
-                    // Si existe una clave de "Contrasena", la encriptamos antes de guardar
-                    if (proyecto.ContainsKey("Contrasena"))
+                        MessageBox.Show("Los proyectos se han guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
                     {
-                        string contrasena = proyecto["Contrasena"].ToString();
-                        proyecto["Contrasena"] = EncriptarContrasena(contrasena); // Encriptar la contraseña
+                        MessageBox.Show("No se ha cargado ningún archivo para guardar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
-                    proyectosJson.Add(proyecto);
+                    // Regresar a Form1
+                    this.Close(); // Cierra FormGestionJSON
+                    Form1 form1 = new Form1(); // Crear una nueva instancia de Form1
+                    form1.Show(); // Mostrar Form1
                 }
-
-                // Serializar el JSON en texto
-                string json = JsonConvert.SerializeObject(proyectosJson, Formatting.Indented);
-
-                // Encriptar el JSON
-                string jsonEncriptado = EncriptarJson(json);
-
-                // Guardar el archivo JSON encriptado en el archivo original
-                if (!string.IsNullOrEmpty(rutaArchivoActual)) // Asegurarse de que la ruta esté definida
+                catch (Exception ex)
                 {
-                    File.WriteAllText(rutaArchivoActual, jsonEncriptado); // Sobrescribir el archivo original con los datos encriptados
-
-                    MessageBox.Show("Los proyectos se han guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Error al guardar proyectos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                else
+            }
+
+            // Evento del botón Guardar
+            private void btnGuardar_Click(object sender, EventArgs e)
+            {
+                GuardarProyectosEnJson();
+            }
+
+            // Evento del botón Borrar
+            private void btnBorrar_Click(object sender, EventArgs e)
+            {
+                foreach (DataGridViewRow row in dataGridViewJSON.SelectedRows)
                 {
-                    MessageBox.Show("No se ha cargado ningún archivo para guardar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    dataGridViewJSON.Rows.Remove(row); // Eliminar las filas seleccionadas
                 }
-
-                // Regresar a Form1
-                this.Close(); // Cierra FormGestionJSON
-                Form1 form1 = new Form1(); // Crear una nueva instancia de Form1
-                form1.Show(); // Mostrar Form1
             }
-            catch (Exception ex)
+
+            private void btnCancelarJSON_Click(object sender, EventArgs e)
             {
-                MessageBox.Show($"Error al guardar proyectos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Hide();
+                Form1 form1 = new Form1();
+                form1.ShowDialog();
             }
-        }
-
-        // Evento del botón Guardar
-        private void btnGuardar_Click(object sender, EventArgs e)
-        {
-            GuardarProyectosEnJson();
-        }
-
-        // Evento del botón Borrar
-        private void btnBorrar_Click(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in dataGridViewJSON.SelectedRows)
-            {
-                dataGridViewJSON.Rows.Remove(row); // Eliminar las filas seleccionadas
-            }
-        }
-
-        private void btnCancelarJSON_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            Form1 form1 = new Form1();
-            form1.ShowDialog();
-        }
 
         
+        }
     }
-}

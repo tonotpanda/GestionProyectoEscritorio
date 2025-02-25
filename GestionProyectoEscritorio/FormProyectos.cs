@@ -17,9 +17,6 @@ namespace GestorDeProyectos
 {
     public partial class FormProyectos : Form
     {
-        private List<Usuario> listaUsuarios = new List<Usuario>();
-        private List<Proyecto> listaProyectos = new List<Proyecto>();
-
         private List<string> usuariosSeleccionados = new List<string>();
         private List<Tareas> tareas = new List<Tareas>();
         private List<string> subtareas = new List<string>();

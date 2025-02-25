@@ -11,7 +11,6 @@
         public partial class FormUsuarios : Form
         {
             private List<Usuario> listaUsuarios = new List<Usuario>(); // Lista para almacenar los usuarios
-
             private static readonly string ClaveEncriptacion = "0123456789012345"; // Clave de 16 caracteres para AES
             private static readonly byte[] IVPersonalizado = Encoding.UTF8.GetBytes("5432109876543210"); // IV invertido (16 bytes)
 
