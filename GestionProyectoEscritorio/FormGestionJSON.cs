@@ -338,5 +338,7 @@ namespace GestionProyectoEscritorio
             Form1 form1 = new Form1();
             form1.ShowDialog();
         }
+
+        
     }
 }
