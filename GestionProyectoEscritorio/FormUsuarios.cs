@@ -23,7 +23,12 @@
                 CargarUsuariosDesdeJson();
             }
 
-            private void btnCrearUsuario_Click(object sender, EventArgs e)
+        private void FormUsuarios_Load(object sender, EventArgs e)
+        {
+            this.textBoxContrasenaUsuario.UseSystemPasswordChar = true;
+        }
+
+        private void btnCrearUsuario_Click(object sender, EventArgs e)
             {
                 // Capturar los datos ingresados por el usuario
                 string nombreUsuario = textBoxNombreUsuario.Text;
@@ -192,10 +197,7 @@
                 }
             }
 
-            private void FormUsuarios_Load(object sender, EventArgs e)
-            {
-                this.textBoxContrasenaUsuario.UseSystemPasswordChar = true;
-            }
+            
 
             // Método para encriptar la contraseña
             private string EncriptarContrasena(string contrasena)
@@ -231,5 +233,7 @@
                 Form1 form1 = new Form1();
                 form1.ShowDialog();
             }
-        }
+
+        
+    }
     }

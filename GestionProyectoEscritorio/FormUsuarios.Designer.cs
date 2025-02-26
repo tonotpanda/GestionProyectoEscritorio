@@ -47,7 +47,7 @@
             this.labelNombre.ForeColor = System.Drawing.Color.White;
             this.labelNombre.Location = new System.Drawing.Point(187, 74);
             this.labelNombre.Name = "labelNombre";
-            this.labelNombre.Size = new System.Drawing.Size(136, 19);
+            this.labelNombre.Size = new System.Drawing.Size(169, 24);
             this.labelNombre.TabIndex = 0;
             this.labelNombre.Text = "Nombre usuario";
             // 
@@ -55,14 +55,14 @@
             // 
             this.textBoxNombreUsuario.Location = new System.Drawing.Point(362, 71);
             this.textBoxNombreUsuario.Name = "textBoxNombreUsuario";
-            this.textBoxNombreUsuario.Size = new System.Drawing.Size(286, 28);
+            this.textBoxNombreUsuario.Size = new System.Drawing.Size(286, 30);
             this.textBoxNombreUsuario.TabIndex = 1;
             // 
             // textBoxContrasenaUsuario
             // 
             this.textBoxContrasenaUsuario.Location = new System.Drawing.Point(362, 137);
             this.textBoxContrasenaUsuario.Name = "textBoxContrasenaUsuario";
-            this.textBoxContrasenaUsuario.Size = new System.Drawing.Size(286, 28);
+            this.textBoxContrasenaUsuario.Size = new System.Drawing.Size(286, 30);
             this.textBoxContrasenaUsuario.TabIndex = 2;
             // 
             // labelContrasena
@@ -73,7 +73,7 @@
             this.labelContrasena.ForeColor = System.Drawing.Color.White;
             this.labelContrasena.Location = new System.Drawing.Point(187, 142);
             this.labelContrasena.Name = "labelContrasena";
-            this.labelContrasena.Size = new System.Drawing.Size(162, 19);
+            this.labelContrasena.Size = new System.Drawing.Size(204, 24);
             this.labelContrasena.TabIndex = 3;
             this.labelContrasena.Text = "Contraseña usuario";
             // 
@@ -85,7 +85,7 @@
             this.labelDesarrollador.ForeColor = System.Drawing.Color.White;
             this.labelDesarrollador.Location = new System.Drawing.Point(187, 213);
             this.labelDesarrollador.Name = "labelDesarrollador";
-            this.labelDesarrollador.Size = new System.Drawing.Size(118, 19);
+            this.labelDesarrollador.Size = new System.Drawing.Size(147, 24);
             this.labelDesarrollador.TabIndex = 4;
             this.labelDesarrollador.Text = "Desarrollador";
             // 
@@ -96,7 +96,7 @@
             this.checkBoxDesarrollador.ForeColor = System.Drawing.Color.White;
             this.checkBoxDesarrollador.Location = new System.Drawing.Point(362, 213);
             this.checkBoxDesarrollador.Name = "checkBoxDesarrollador";
-            this.checkBoxDesarrollador.Size = new System.Drawing.Size(137, 25);
+            this.checkBoxDesarrollador.Size = new System.Drawing.Size(150, 29);
             this.checkBoxDesarrollador.TabIndex = 5;
             this.checkBoxDesarrollador.Text = "Desarrollador";
             this.checkBoxDesarrollador.UseVisualStyleBackColor = false;
@@ -123,7 +123,7 @@
             // 
             // FormUsuarios
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::GestionProyectoEscritorio.Properties.Resources.fondo_chsarp_nergo;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
@@ -136,11 +136,11 @@
             this.Controls.Add(this.textBoxContrasenaUsuario);
             this.Controls.Add(this.textBoxNombreUsuario);
             this.Controls.Add(this.labelNombre);
-            this.Font = new System.Drawing.Font("Merriweather Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormUsuarios";
             this.Text = "Usuarios";
-            
+            this.Load += new System.EventHandler(this.FormUsuarios_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
