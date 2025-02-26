@@ -88,80 +88,54 @@
                 }
             }
 
-            // Método para cargar los datos en el DataGridView
-            private void CargarDatosEnDataGridView(string json)
+        // Método para cargar los datos en el DataGridView
+        private void CargarDatosEnDataGridView(string json)
+        {
+            dataGridViewJSON.Rows.Clear();
+            dataGridViewJSON.Columns.Clear();
+
+            // Deserializar el JSON a una lista de proyectos
+            var proyectos = JsonConvert.DeserializeObject<List<Proyecto>>(json);
+
+            if (proyectos == null || proyectos.Count == 0)
             {
-                dataGridViewJSON.Rows.Clear();
-                dataGridViewJSON.Columns.Clear();
+                MessageBox.Show("No se encontraron proyectos en el archivo JSON.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-                try
+            // Crear columnas fijas para el DataGridView
+            dataGridViewJSON.Columns.Add("NombreProyecto", "Nombre del Proyecto");
+            dataGridViewJSON.Columns.Add("FechaInicio", "Fecha de Inicio");
+            dataGridViewJSON.Columns.Add("FechaFin", "Fecha de Fin");
+            dataGridViewJSON.Columns.Add("Usuarios", "Usuarios");
+            dataGridViewJSON.Columns.Add("Tareas", "Tareas");
+            dataGridViewJSON.Columns.Add("Subtareas", "Subtareas");
+
+            // Llenar las filas con los datos de cada proyecto
+            foreach (var proyecto in proyectos)
+            {
+                string nombreProyecto = proyecto.NombreProyecto;
+                string fechaInicio = proyecto.FechaInicio.ToString("yyyy-MM-dd");
+                string fechaFin = proyecto.FechaFin.ToString("yyyy-MM-dd");
+                string usuarios = string.Join(", ", proyecto.Usuarios);
+
+                // Manejar las tareas y subtareas
+                foreach (var tarea in proyecto.Tareas)
                 {
-                    // Deserializar el JSON a un objeto dinámico (JArray o JObject)
-                    var jsonData = JsonConvert.DeserializeObject<dynamic>(json);
+                    string nombreTarea = tarea.NombreTarea;
+                    string subtareas = string.Join(", ", tarea.Subtareas);
 
-                    if (jsonData == null)
-                    {
-                        MessageBox.Show("El archivo JSON está vacío o no es válido.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    // Si el JSON es un array (JArray)
-                    if (jsonData is JArray)
-                    {
-                        // Crear columnas dinámicas basadas en las propiedades del primer objeto
-                        var firstItem = jsonData[0];
-                        if (firstItem != null)
-                        {
-                            foreach (JProperty property in firstItem)
-                            {
-                                dataGridViewJSON.Columns.Add(property.Name, property.Name);
-                            }
-
-                            // Llenar las filas con los datos del JSON
-                            foreach (var item in jsonData)
-                            {
-                                var row = new List<string>();
-                                foreach (JProperty property in item)
-                                {
-                                    row.Add(property.Value.ToString());
-                                }
-                                dataGridViewJSON.Rows.Add(row.ToArray());
-                            }
-                        }
-                    }
-                    // Si el JSON es un objeto (JObject)
-                    else if (jsonData is JObject)
-                    {
-                        // Crear columnas dinámicas basadas en las propiedades del objeto
-                        foreach (JProperty property in jsonData)
-                        {
-                            dataGridViewJSON.Columns.Add(property.Name, property.Name);
-                        }
-
-                        // Llenar una fila con los datos del JSON
-                        var row = new List<string>();
-                        foreach (JProperty property in jsonData)
-                        {
-                            row.Add(property.Value.ToString());
-                        }
-                        dataGridViewJSON.Rows.Add(row.ToArray());
-                    }
-                    else
-                    {
-                        MessageBox.Show("El archivo JSON no tiene una estructura válida.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-
-                    // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
-                    dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al cargar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Añadir una fila al DataGridView
+                    dataGridViewJSON.Rows.Add(nombreProyecto, fechaInicio, fechaFin, usuarios, nombreTarea, subtareas);
                 }
             }
 
-            // Método para desencriptar la contraseña
-            private string DesencriptarContrasena(string contrasenaEncriptada)
+            // Ajustar el tamaño de las columnas para que ocupe todo el espacio disponible
+            dataGridViewJSON.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+
+        // Método para desencriptar la contraseña
+        private string DesencriptarContrasena(string contrasenaEncriptada)
             {
                 try
                 {
